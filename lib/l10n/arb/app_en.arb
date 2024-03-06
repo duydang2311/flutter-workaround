@@ -1,0 +1,15 @@
+{
+    "@@locale": "en",
+    "counterAppBarTitle": "Counter",
+    "@counterAppBarTitle": {
+        "description": "Text shown in the AppBar of the Counter Page"
+    },
+    "brandName": "Workaround",
+    "@_SIGN_IN": {},
+    "signInHeading": "Let's sign you in.",
+    "signInEmailLabel": "Email address *",
+    "signInEmailHint": "Enter your email address",
+    "signInPasswordLabel": "Password *",
+    "signInPasswordHint": "Enter your password",
+    "signInSubmit": "Sign in"
+}
