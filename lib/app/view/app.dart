@@ -1,6 +1,7 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:workaround/authentication/bloc/authentication_bloc.dart';
 import 'package:workaround/l10n/l10n.dart';
@@ -18,19 +19,20 @@ final class App extends StatefulWidget {
 
 final class _AppState extends State<App> {
   late final AuthenticationRepository _authenticationRepository;
-  late final UserRepository _userRepository;
+  late final Supabase _supabase;
+  late final AppUserRepository _userRepository;
 
   @override
   void initState() {
+    _supabase = Supabase.instance;
+    _authenticationRepository = SupabaseAuthenticationRepository(
+      supabase: _supabase,
+      supabaseRedirectUrl: 'io.supabase.flutterquickstart://login-callback/',
+    );
+    _userRepository = SupabaseAppUserRepository(
+      supabase: _supabase,
+    );
     super.initState();
-    _authenticationRepository = AuthenticationRepository();
-    _userRepository = UserRepository();
-  }
-
-  @override
-  void dispose() {
-    _authenticationRepository.dispose();
-    super.dispose();
   }
 
   @override
