@@ -9,7 +9,18 @@
     "signInHeading": "Let's sign you in.",
     "signInEmailLabel": "Email address *",
     "signInEmailHint": "Enter your email address",
+    "signInEmailErrorEmpty": "Please enter an email address.",
+    "signInEmailErrorInvalid": "Please enter a valid email address.",
     "signInPasswordLabel": "Password *",
     "signInPasswordHint": "Enter your password",
+    "signInPasswordErrorEmpty": "Please enter a password.",
+    "signInPasswordErrorMinLength": "Please enter a password with at least {minLength} characters.",
+    "@signInPasswordErrorMinLength": {
+        "placeholders": {
+            "minLength": {
+                "type": "int"
+            }
+        }
+    },
     "signInSubmit": "Sign in"
 }

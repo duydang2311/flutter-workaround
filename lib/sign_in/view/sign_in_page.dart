@@ -1,18 +1,30 @@
-import 'dart:developer';
-
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:workaround/counter/counter.dart';
+import 'package:formz/formz.dart';
 import 'package:workaround/l10n/l10n.dart';
+import 'package:workaround/sign_in/sign_in.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
+  static Route<void> route() {
+    return MaterialPageRoute<void>(builder: (_) => const SignInPage());
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CounterCubit(),
-      child: const SignInView(),
+    return Scaffold(
+      body: SafeArea(
+        minimum: const EdgeInsets.all(16),
+        child: BlocProvider(
+          create: (context) => SignInBloc(
+            authenticationRepository:
+                RepositoryProvider.of<AuthenticationRepository>(context),
+          ),
+          child: const SignInView(),
+        ),
+      ),
     );
   }
 }
@@ -24,59 +36,123 @@ class SignInView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    return Scaffold(
-      body: SafeArea(
-        minimum: const EdgeInsets.all(16),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.brandName,
-                  style: theme.textTheme.headlineSmall!.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.left,
+    return BlocListener<SignInBloc, SignInState>(
+      listener: (context, state) {
+        if (state.status.isFailure) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(const SnackBar(content: Text('SignGin failed.')));
+        }
+      },
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.brandName,
+                style: theme.textTheme.headlineSmall!.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w700,
                 ),
-                const SizedBox(height: 32),
-                Text(
-                  l10n.signInHeading,
-                  style: theme.textTheme.displayLarge,
-                  textAlign: TextAlign.left,
-                ),
-                const SizedBox(height: 32),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: l10n.signInEmailLabel,
-                    hintText: l10n.signInEmailHint,
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: l10n.signInPasswordLabel,
-                    hintText: l10n.signInPasswordHint,
-                    border: const OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                  onFieldSubmitted: log,
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    child: Text(l10n.signInSubmit),
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 32),
+              Text(
+                l10n.signInHeading,
+                style: theme.textTheme.displayLarge,
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 32),
+              const _EmailInput(),
+              const SizedBox(height: 16),
+              const _PasswordInput(),
+              const SizedBox(height: 32),
+              const SizedBox(
+                width: double.infinity,
+                child: _SubmitButton(),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _EmailInput extends StatelessWidget {
+  const _EmailInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return BlocBuilder<SignInBloc, SignInState>(
+      buildWhen: (previous, current) => previous.email != current.email,
+      builder: (context, state) {
+        return TextField(
+          key: const Key('signInView_emailInput_textField'),
+          onChanged: (email) =>
+              context.read<SignInBloc>().add(SignInEmailChanged(email)),
+          decoration: InputDecoration(
+            labelText: l10n.signInEmailLabel,
+            hintText: l10n.signInEmailHint,
+            border: const OutlineInputBorder(),
+            errorText: state.email.displayError?.getMessage(context),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PasswordInput extends StatelessWidget {
+  const _PasswordInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return BlocBuilder<SignInBloc, SignInState>(
+      buildWhen: (previous, current) => previous.password != current.password,
+      builder: (context, state) {
+        return TextField(
+          key: const Key('signInView_passwordInput_textField'),
+          onChanged: (password) =>
+              context.read<SignInBloc>().add(SignInPasswordChanged(password)),
+          decoration: InputDecoration(
+            labelText: l10n.signInPasswordLabel,
+            hintText: l10n.signInPasswordHint,
+            border: const OutlineInputBorder(),
+            errorText: state.password.displayError?.getMessage(context),
+          ),
+          obscureText: true,
+        );
+      },
+    );
+  }
+}
+
+class _SubmitButton extends StatelessWidget {
+  const _SubmitButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return BlocBuilder<SignInBloc, SignInState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.isValid != current.isValid,
+      builder: (context, state) {
+        return ElevatedButton(
+          onPressed: !state.isValid || state.status.isInProgress
+              ? null
+              : () {
+                  context.read<SignInBloc>().add(const SignInSubmitted());
+                },
+          child: state.status.isInProgress
+              ? const CircularProgressIndicator()
+              : Text(l10n.signInSubmit),
+        );
+      },
     );
   }
 }
