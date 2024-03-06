@@ -18,6 +18,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   formz: ^0.7.0
+  fpdart: ^1.1.0
   intl: ^0.18.1
   supabase_flutter: ^2.3.4
   user_repository:

@@ -20,9 +20,10 @@ class AuthenticationBloc
     on<AuthenticationLogoutRequested>(_onAuthenticationLogoutRequested);
     _authenticationStatusSubscription = _userRepository.user
         .map(
-          (appUser) => appUser == null
-              ? AuthenticationStatus.unauthenticated
-              : AuthenticationStatus.authenticated,
+          (appUser) => appUser.match(
+            () => AuthenticationStatus.unauthenticated,
+            (_) => AuthenticationStatus.authenticated,
+          ),
         )
         .listen((status) => add(_AuthenticationStatusChanged(status)));
   }
@@ -48,9 +49,10 @@ class AuthenticationBloc
       case AuthenticationStatus.authenticated:
         final user = await _userRepository.user.last;
         return emit(
-          user != null
-              ? AuthenticationState.authenticated(user)
-              : const AuthenticationState.unauthenticated(),
+          user.match(
+            () => const AuthenticationState.unauthenticated(),
+            AuthenticationState.authenticated,
+          ),
         );
       case AuthenticationStatus.unknown:
         return emit(const AuthenticationState.unknown());
@@ -61,6 +63,6 @@ class AuthenticationBloc
     AuthenticationLogoutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    await _authenticationRepository.signOut();
+    await _authenticationRepository.signOut().run();
   }
 }

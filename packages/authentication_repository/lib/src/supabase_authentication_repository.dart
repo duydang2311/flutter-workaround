@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final class SupabaseAuthenticationRepository
@@ -15,30 +14,56 @@ final class SupabaseAuthenticationRepository
   final String _supabaseRedirectUrl;
 
   @override
-  Future<void> signInWithEmailAndPassword({
+  TaskEither<AuthenticationError, void> signInWithEmailAndPassword({
     required String email,
     required String password,
-  }) async {
-    await _supabase.client.auth.signInWithPassword(
-      email: email,
-      password: password,
+  }) {
+    return TaskEither.tryCatch(
+      () async {
+        await _supabase.client.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+      },
+      _catch,
     );
   }
 
   @override
-  Future<void> signUpWithEmailAndPassword({
+  TaskEither<AuthenticationError, void> signUpWithEmailAndPassword({
     required String email,
     required String password,
-  }) async {
-    await _supabase.client.auth.signUp(
-      email: email,
-      password: password,
-      emailRedirectTo: _supabaseRedirectUrl,
+  }) {
+    return TaskEither.tryCatch(
+      () async {
+        await _supabase.client.auth.signUp(
+          email: email,
+          password: password,
+          emailRedirectTo: _supabaseRedirectUrl,
+        );
+      },
+      _catch,
     );
   }
 
   @override
-  Future<void> signOut() async {
-    await _supabase.client.auth.signOut();
+  TaskEither<AuthenticationError, void> signOut() {
+    return TaskEither.tryCatch(
+      () async {
+        await _supabase.client.auth.signOut();
+      },
+      _catch,
+    );
+  }
+
+  AuthenticationError _catch(Object error, StackTrace stackTrace) {
+    if (error is AuthException) {
+      return AuthenticationError(
+        statusCode:
+            error.statusCode == null ? 0 : int.tryParse(error.statusCode!) ?? 0,
+        message: error.message,
+      );
+    }
+    return const AuthenticationError(statusCode: 0, message: 'Unknown error');
   }
 }

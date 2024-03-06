@@ -11,4 +11,5 @@ dev_dependencies:
   test: ^1.25.2
   very_good_analysis: ^5.1.0
 dependencies:
+  fpdart: ^1.1.0
   supabase_flutter: ^2.3.4

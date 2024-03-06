@@ -1,15 +1,22 @@
-import 'dart:async';
+import 'package:fpdart/fpdart.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
 
+final class AuthenticationError {
+  const AuthenticationError({required this.statusCode, required this.message});
+
+  final int statusCode;
+  final String message;
+}
+
 abstract class AuthenticationRepository {
-  Future<void> signInWithEmailAndPassword({
+  TaskEither<AuthenticationError, void> signInWithEmailAndPassword({
     required String email,
     required String password,
   });
-  Future<void> signUpWithEmailAndPassword({
+  TaskEither<AuthenticationError, void> signUpWithEmailAndPassword({
     required String email,
     required String password,
   });
-  Future<void> signOut();
+  TaskEither<AuthenticationError, void> signOut();
 }

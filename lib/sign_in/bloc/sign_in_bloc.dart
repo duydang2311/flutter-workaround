@@ -62,14 +62,18 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     if (!state.isValid) return;
 
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-    try {
-      await _authenticationRepository.signInWithEmailAndPassword(
-        email: state.email.value,
-        password: state.password.value,
-      );
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
-    } catch (_) {
-      emit(state.copyWith(status: FormzSubmissionStatus.failure));
-    }
+    await _authenticationRepository
+        .signInWithEmailAndPassword(
+      email: state.email.value,
+      password: state.password.value,
+    )
+        .match(
+      (error) {
+        emit(state.copyWith(status: FormzSubmissionStatus.failure));
+      },
+      (_) {
+        emit(state.copyWith(status: FormzSubmissionStatus.success));
+      },
+    ).run();
   }
 }
