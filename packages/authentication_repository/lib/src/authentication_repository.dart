@@ -9,7 +9,7 @@ final class AuthenticationError {
   final String message;
 }
 
-abstract class AuthenticationRepository {
+abstract interface class AuthenticationRepository {
   TaskEither<AuthenticationError, void> signInWithEmailAndPassword({
     required String email,
     required String password,

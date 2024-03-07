@@ -5,8 +5,8 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AppBlocObserver extends BlocObserver {
-  const AppBlocObserver();
+class _AppBlocObserver extends BlocObserver {
+  const _AppBlocObserver();
 
   @override
   void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
@@ -26,7 +26,7 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
 
-  Bloc.observer = const AppBlocObserver();
+  Bloc.observer = const _AppBlocObserver();
 
   await Supabase.initialize(
     url: const String.fromEnvironment('SUPABASE_URL'),
