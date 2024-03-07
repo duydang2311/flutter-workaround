@@ -12,22 +12,20 @@ final class SupabaseAppUserRepository implements AppUserRepository {
   Stream<Option<AppUser>> get user =>
       _supabase.client.auth.onAuthStateChange.map((state) {
         // if (state.session != null) _supabase.client.auth.signOut();
-        return state.session == null
-            ? const Option.none()
-            : Some(AppUser(state.session!.user.id));
+        return Option.fromNullable(state.session).map(
+          (t) => AppUser(t.user.id),
+        );
       });
 
   @override
   TaskOption<AppUser> getUser() {
-    return TaskOption(() async {
+    return TaskOption.tryCatch(() async {
       if (_supabase.client.auth.currentSession == null) {
-        return const Option.none();
+        return null;
       }
 
       final response = await _supabase.client.auth.getUser();
-      return response.user == null
-          ? const Option.none()
-          : Some(AppUser(response.user!.id));
-    });
+      return response.user == null ? null : AppUser(response.user!.id);
+    }).flatMap((appUser) => Option.fromNullable(appUser).toTaskOption());
   }
 }
