@@ -47,7 +47,7 @@ class AuthenticationBloc
       case AuthenticationStatus.unauthenticated:
         return emit(const AuthenticationState.unauthenticated());
       case AuthenticationStatus.authenticated:
-        final user = await _userRepository.user.last;
+        final user = await _userRepository.user.first;
         return emit(
           user.match(
             () => const AuthenticationState.unauthenticated(),
