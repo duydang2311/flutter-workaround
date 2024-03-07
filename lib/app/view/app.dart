@@ -1,13 +1,12 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:workaround/authentication/bloc/authentication_bloc.dart';
 import 'package:workaround/l10n/l10n.dart';
-import 'package:workaround/sign_in/sign_in.dart';
-import 'package:workaround/splash/splash.dart';
-import 'package:workaround/splash/view/splash_page.dart';
+import 'package:workaround/router/router.dart';
 import 'package:workaround/theme/theme.dart';
 
 final class App extends StatefulWidget {
@@ -58,40 +57,20 @@ final class AppView extends StatefulWidget {
 }
 
 final class _AppViewState extends State<AppView> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
-
-  NavigatorState get _navigator => _navigatorKey.currentState!;
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: _navigatorKey,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) {
-        return BlocListener<AuthenticationBloc, AuthenticationState>(
-          listener: (context, state) {
-            switch (state.status) {
-              case AuthenticationStatus.authenticated:
-                _navigator.pushAndRemoveUntil<void>(
-                  SplashPage.route(),
-                  (route) => false,
-                );
-              case AuthenticationStatus.unauthenticated:
-                _navigator.pushAndRemoveUntil<void>(
-                  SignInPage.route(),
-                  (route) => false,
-                );
-              case AuthenticationStatus.unknown:
-                break;
-            }
-          },
-          child: child,
-        );
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, _) {
+        router.refresh();
       },
-      onGenerateRoute: (_) => SplashPage.route(),
+      child: MaterialApp.router(
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

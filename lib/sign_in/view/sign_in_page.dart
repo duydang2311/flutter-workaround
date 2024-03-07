@@ -8,10 +8,6 @@ import 'package:workaround/sign_in/sign_in.dart';
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
-  static Route<void> route() {
-    return MaterialPageRoute<void>(builder: (_) => const SignInPage());
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,11 +33,12 @@ class SignInView extends StatelessWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     return BlocListener<SignInBloc, SignInState>(
+      listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status.isFailure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(const SnackBar(content: Text('SignGin failed.')));
+            ..showSnackBar(const SnackBar(content: Text('Sign in failed.')));
         }
       },
       child: Center(
@@ -96,7 +93,6 @@ class _EmailInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: l10n.signInEmailLabel,
             hintText: l10n.signInEmailHint,
-            border: const OutlineInputBorder(),
             errorText: state.email.displayError?.getMessage(context),
           ),
         );
@@ -121,7 +117,6 @@ class _PasswordInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: l10n.signInPasswordLabel,
             hintText: l10n.signInPasswordHint,
-            border: const OutlineInputBorder(),
             errorText: state.password.displayError?.getMessage(context),
           ),
           obscureText: true,
@@ -148,9 +143,27 @@ class _SubmitButton extends StatelessWidget {
               : () {
                   context.read<SignInBloc>().add(const SignInSubmitted());
                 },
-          child: state.status.isInProgress
-              ? const CircularProgressIndicator()
-              : Text(l10n.signInSubmit),
+          child: AnimatedSwitcher(
+            duration: Durations.medium2,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+            switchInCurve: Curves.easeIn,
+            switchOutCurve: Curves.easeOut,
+            child: state.status.isInProgress
+                ? Container(
+                    padding: const EdgeInsets.all(2),
+                    width: 20,
+                    height: 20,
+                    child: const CircularProgressIndicator(),
+                  )
+                : Text(
+                    l10n.signInSubmit,
+                  ),
+          ),
         );
       },
     );
