@@ -1,4 +1,4 @@
-name: authentication_repository
+name: infrastructure
 description: A Very Good Project created by Very Good CLI.
 version: 0.1.0+1
 publish_to: none
@@ -9,7 +9,5 @@ environment:
 dev_dependencies:
   very_good_analysis: ^5.1.0
 dependencies:
-  fpdart: ^1.1.0
-  infrastructure:
-    path: ../infrastructure
+  equatable: ^2.0.5
   supabase_flutter: ^2.3.4

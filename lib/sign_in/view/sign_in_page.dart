@@ -141,7 +141,7 @@ class _SubmitButton extends StatelessWidget {
           onPressed: !state.isValid || state.status.isInProgress
               ? null
               : () {
-                  context.read<SignInBloc>().add(const _SignInSubmitted());
+                  context.read<SignInBloc>().add(const SignInSubmitted());
                 },
           child: AnimatedSwitcher(
             duration: Durations.medium2,

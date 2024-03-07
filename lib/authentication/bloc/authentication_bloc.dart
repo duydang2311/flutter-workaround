@@ -18,7 +18,7 @@ class AuthenticationBloc
         super(const AuthenticationState.unknown()) {
     on<_AuthenticationStatusChanged>(_onAuthenticationStatusChanged);
     on<AuthenticationLogoutRequested>(_onAuthenticationLogoutRequested);
-    _authenticationStatusSubscription = _userRepository.user
+    _authenticationStatusSubscription = _userRepository.currentUserStream
         .map(
           (appUser) => appUser.match(
             () => AuthenticationStatus.unauthenticated,
@@ -47,13 +47,10 @@ class AuthenticationBloc
       case AuthenticationStatus.unauthenticated:
         return emit(const AuthenticationState.unauthenticated());
       case AuthenticationStatus.authenticated:
-        final state = await _userRepository
-            .getUser()
-            .match(
-              () => const AuthenticationState.unauthenticated(),
-              AuthenticationState.authenticated,
-            )
-            .run();
+        final state = _userRepository.currentUser.match(
+          () => const AuthenticationState.unauthenticated(),
+          AuthenticationState.authenticated,
+        );
         emit(state);
       case AuthenticationStatus.unknown:
         return emit(const AuthenticationState.unknown());

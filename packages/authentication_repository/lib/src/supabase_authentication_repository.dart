@@ -58,12 +58,8 @@ final class SupabaseAuthenticationRepository
 
   AuthenticationError _catch(Object error, StackTrace stackTrace) {
     if (error is AuthException) {
-      return AuthenticationError(
-        statusCode:
-            error.statusCode == null ? 0 : int.tryParse(error.statusCode!) ?? 0,
-        message: error.message,
-      );
+      return AuthenticationError.fromException(error);
     }
-    return const AuthenticationError(statusCode: 0, message: 'Unknown error');
+    return const AuthenticationError.unknown();
   }
 }

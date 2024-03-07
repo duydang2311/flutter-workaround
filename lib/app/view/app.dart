@@ -59,8 +59,12 @@ final class _AppViewState extends State<AppView> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
-      listener: (context, _) {
-        router.refresh();
+      listener: (context, state) {
+        if (state.status == AuthenticationStatus.authenticated) {
+          router.go('/home');
+        } else if (state.status == AuthenticationStatus.unauthenticated) {
+          router.go('/sign-in');
+        }
       },
       child: MaterialApp.router(
         theme: AppTheme.light,

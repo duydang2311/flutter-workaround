@@ -1,13 +1,7 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
-
-final class AuthenticationError {
-  const AuthenticationError({required this.statusCode, required this.message});
-
-  final int statusCode;
-  final String message;
-}
 
 abstract interface class AuthenticationRepository {
   TaskEither<AuthenticationError, void> signInWithEmailAndPassword({

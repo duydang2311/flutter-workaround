@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:user_repository/src/models/get_user_error.dart';
 import 'package:user_repository/user_repository.dart';
 
 final class SupabaseAppUserRepository implements AppUserRepository {
@@ -9,7 +10,12 @@ final class SupabaseAppUserRepository implements AppUserRepository {
   final Supabase _supabase;
 
   @override
-  Stream<Option<AppUser>> get user =>
+  Option<AppUser> get currentUser =>
+      Option.fromNullable(_supabase.client.auth.currentSession)
+          .map((session) => AppUser(session.user.id));
+
+  @override
+  Stream<Option<AppUser>> get currentUserStream =>
       _supabase.client.auth.onAuthStateChange.map((state) {
         // if (state.session != null) _supabase.client.auth.signOut();
         return Option.fromNullable(state.session).map(
@@ -18,14 +24,20 @@ final class SupabaseAppUserRepository implements AppUserRepository {
       });
 
   @override
-  TaskOption<AppUser> getUser() {
-    return TaskOption.tryCatch(() async {
-      if (_supabase.client.auth.currentSession == null) {
-        return null;
-      }
-
-      final response = await _supabase.client.auth.getUser();
-      return response.user == null ? null : AppUser(response.user!.id);
-    }).flatMap((appUser) => Option.fromNullable(appUser).toTaskOption());
+  TaskEither<GetUserError, AppUser> getUser() {
+    return TaskEither.tryCatch(
+      _supabase.client.auth.getUser,
+      (exception, stackTrace) {
+        if (exception is AuthException) {
+          return GetUserError.fromException(exception);
+        }
+        return const GetUserError.unknown();
+      },
+    )
+        .flatMap(
+          (response) => Either.fromNullable(response.user, GetUserError.unknown)
+              .toTaskEither(),
+        )
+        .map((user) => AppUser(user.id));
   }
 }
