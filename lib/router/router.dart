@@ -34,19 +34,3 @@ final router = GoRouter(
     return null;
   },
 );
-
-// builder: (context, child) {
-//   return BlocListener<AuthenticationBloc, AuthenticationState>(
-//     listener: (context, state) {
-//       switch (state.status) {
-//         case AuthenticationStatus.authenticated:
-//           context.go('/splash');
-//         case AuthenticationStatus.unauthenticated:
-//           context.go('/sign-in');
-//         case AuthenticationStatus.unknown:
-//           break;
-//       }
-//     },
-//     child: child,
-//   );
-// },
