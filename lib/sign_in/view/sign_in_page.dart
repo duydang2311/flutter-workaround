@@ -19,15 +19,15 @@ class SignInPage extends StatelessWidget {
             authenticationRepository:
                 RepositoryProvider.of<AuthenticationRepository>(context),
           ),
-          child: const SignInView(),
+          child: const _SignInView(),
         ),
       ),
     );
   }
 }
 
-class SignInView extends StatelessWidget {
-  const SignInView({super.key});
+class _SignInView extends StatelessWidget {
+  const _SignInView();
 
   @override
   Widget build(BuildContext context) {

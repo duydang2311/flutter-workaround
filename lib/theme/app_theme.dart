@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 sealed class AppTheme {
   static final _lightColorScheme = ColorScheme.fromSeed(
-    seedColor: const Color(0xFF769c00),
+    seedColor: const Color(0xFF0057FF),
   );
 
   static final _darkColorScheme = ColorScheme.fromSeed(
-    seedColor: const Color(0xFF769c00),
+    seedColor: const Color(0xFF0057FF),
     brightness: Brightness.dark,
   );
 
@@ -35,6 +35,10 @@ sealed class AppTheme {
       ),
       progressIndicatorTheme:
           const ProgressIndicatorThemeData(linearMinHeight: 2),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        selectedItemColor: colorScheme.primary,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+      ),
       useMaterial3: true,
     );
   }
