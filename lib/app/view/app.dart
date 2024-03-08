@@ -1,4 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -42,7 +43,16 @@ final class _AppState extends State<App> {
           authenticationRepository: _authenticationRepository,
           userRepository: _userRepository,
         ),
-        child: const AppView(),
+        child: BlocListener<AuthenticationBloc, AuthenticationState>(
+          listener: (context, state) {
+            if (state.status == AuthenticationStatus.authenticated) {
+              router.go('/home');
+            } else if (state.status == AuthenticationStatus.unauthenticated) {
+              router.go('/sign-in');
+            }
+          },
+          child: const AppView(),
+        ),
       ),
     );
   }
@@ -55,25 +65,81 @@ final class AppView extends StatefulWidget {
   State<StatefulWidget> createState() => _AppViewState();
 }
 
+CustomColors lightCustomColors = const CustomColors(danger: Color(0xFFE53935));
+CustomColors darkCustomColors = const CustomColors(danger: Color(0xFFEF9A9A));
+
 final class _AppViewState extends State<AppView> {
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthenticationBloc, AuthenticationState>(
-      listener: (context, state) {
-        if (state.status == AuthenticationStatus.authenticated) {
-          router.go('/home');
-        } else if (state.status == AuthenticationStatus.unauthenticated) {
-          router.go('/sign-in');
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        ColorScheme lightColorScheme;
+        ColorScheme darkColorScheme;
+
+        if (lightDynamic != null && darkDynamic != null) {
+          // On Android S+ devices, use the provided dynamic color scheme.
+          // (Recommended) Harmonize the dynamic color scheme' built-in semantic colors.
+          lightColorScheme = lightDynamic.harmonized();
+          // (Optional) Customize the scheme as desired. For example, one might
+          // want to use a brand color to override the dynamic [ColorScheme.secondary].
+          lightColorScheme = lightColorScheme.copyWith(
+              secondary: AppTheme.lightColorScheme.primary);
+          // (Optional) If applicable, harmonize custom colors.
+          lightCustomColors = lightCustomColors.harmonized(lightColorScheme);
+
+          // Repeat for the dark color scheme.
+          darkColorScheme = darkDynamic.harmonized();
+          darkColorScheme = darkColorScheme.copyWith(
+            secondary: AppTheme.darkColorScheme.primary,
+          );
+          darkCustomColors = darkCustomColors.harmonized(darkColorScheme);
+        } else {
+          // Otherwise, use fallback schemes.
+          lightColorScheme = AppTheme.lightColorScheme;
+          darkColorScheme = AppTheme.darkColorScheme;
         }
+
+        return MaterialApp.router(
+          theme: AppTheme.build(AppTheme.lighterOutline(lightColorScheme))
+              .copyWith(extensions: [lightCustomColors]),
+          darkTheme: AppTheme.build(AppTheme.darkerOutline(darkColorScheme))
+              .copyWith(extensions: [darkCustomColors]),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+        );
       },
-      child: MaterialApp.router(
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: router,
-        debugShowCheckedModeBanner: false,
-      ),
     );
+  }
+}
+
+@immutable
+class CustomColors extends ThemeExtension<CustomColors> {
+  const CustomColors({
+    required this.danger,
+  });
+
+  final Color? danger;
+
+  @override
+  CustomColors copyWith({Color? danger}) {
+    return CustomColors(
+      danger: danger ?? this.danger,
+    );
+  }
+
+  @override
+  CustomColors lerp(ThemeExtension<CustomColors>? other, double t) {
+    if (other is! CustomColors) {
+      return this;
+    }
+    return CustomColors(
+      danger: Color.lerp(danger, other.danger, t),
+    );
+  }
+
+  CustomColors harmonized(ColorScheme dynamic) {
+    return copyWith(danger: danger!.harmonizeWith(dynamic.primary));
   }
 }

@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
 
-sealed class AppTheme {
-  static final _lightColorScheme = ColorScheme.fromSeed(
+abstract class AppTheme {
+  static final lightColorScheme = ColorScheme.fromSeed(
     seedColor: const Color(0xFF0057FF),
   );
 
-  static final _darkColorScheme = ColorScheme.fromSeed(
+  static ColorScheme lighterOutline(ColorScheme colorScheme) =>
+      colorScheme.copyWith(
+        outline: _lighten(lightColorScheme.outline, 0.3),
+        outlineVariant: _lighten(lightColorScheme.outlineVariant, 0.3),
+      );
+
+  static final darkColorScheme = ColorScheme.fromSeed(
     seedColor: const Color(0xFF0057FF),
     brightness: Brightness.dark,
   );
 
-  static ThemeData get light => _build(_lightColorScheme);
-  static ThemeData get dark => _build(_darkColorScheme);
+  static ColorScheme darkerOutline(ColorScheme colorScheme) =>
+      colorScheme.copyWith(
+        outline: _darken(lightColorScheme.outline, 0.2),
+        outlineVariant: _darken(lightColorScheme.outlineVariant, 0.2),
+      );
 
-  static ThemeData _build(ColorScheme colorScheme) {
+  static ThemeData build(ColorScheme colorScheme) {
     return ThemeData(
       colorScheme: colorScheme,
       appBarTheme: AppBarTheme(color: colorScheme.tertiaryContainer),
@@ -30,7 +39,10 @@ sealed class AppTheme {
       ),
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ),
+          borderSide: BorderSide(width: 4),
         ),
       ),
       progressIndicatorTheme:
@@ -42,4 +54,18 @@ sealed class AppTheme {
       useMaterial3: true,
     );
   }
+}
+
+Color _darken(Color color, [double amount = .1]) {
+  final hsl = HSLColor.fromColor(color);
+  final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+  return hslDark.toColor();
+}
+
+Color _lighten(Color color, [double amount = .1]) {
+  final hsl = HSLColor.fromColor(color);
+  final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+
+  return hslLight.toColor();
 }
