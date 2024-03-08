@@ -22,5 +22,14 @@
             }
         }
     },
-    "signInSubmit": "Sign in"
+    "signInSubmit": "Sign in",
+    "signInSubmitErrorInvalidCredentials": "Invalid login credentials.",
+    "signInSubmitErrorUnknown": "Cannot authenticate due to an unknown error (code: {code}).",
+    "@signInSubmitErrorUnknown": {
+        "placeholders": {
+            "code": {
+                "type": "int"
+            }
+        }
+    }
 }

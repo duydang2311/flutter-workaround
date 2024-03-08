@@ -1,7 +1,9 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
+import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/sign_in/models/models.dart';
 import 'package:workaround/sign_in/sign_in.dart';
 
@@ -9,14 +11,18 @@ part 'sign_in_event.dart';
 part 'sign_in_state.dart';
 
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
-  SignInBloc({required AuthenticationRepository authenticationRepository})
-      : _authenticationRepository = authenticationRepository,
+  SignInBloc({
+    required BuildContext buildContext,
+    required AuthenticationRepository authenticationRepository,
+  })  : _buildContext = buildContext,
+        _authenticationRepository = authenticationRepository,
         super(SignInState(email: Email.pure())) {
     on<SignInEmailChanged>(_onEmailChanged);
     on<SignInPasswordChanged>(_onPasswordChanged);
     on<SignInSubmitted>(_onSubmitted);
   }
 
+  final BuildContext _buildContext;
   final AuthenticationRepository _authenticationRepository;
 
   void _onEmailChanged(
@@ -61,7 +67,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   ) async {
     if (!state.isValid) return;
 
-    emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
+    emit(
+      state.copyWith(
+        submission:
+            const FormSubmissionState(status: FormzSubmissionStatus.inProgress),
+      ),
+    );
     await _authenticationRepository
         .signInWithEmailAndPassword(
       email: state.email.value,
@@ -69,11 +80,32 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     )
         .match(
       (error) {
-        emit(state.copyWith(status: FormzSubmissionStatus.failure));
+        emit(
+          state.copyWith(
+            submission: FormSubmissionState(
+              status: FormzSubmissionStatus.failure,
+              errorMessage: _errorMessage(error),
+            ),
+          ),
+        );
       },
       (_) {
-        emit(state.copyWith(status: FormzSubmissionStatus.success));
+        emit(
+          state.copyWith(
+            submission: const FormSubmissionState(
+              status: FormzSubmissionStatus.success,
+            ),
+          ),
+        );
       },
     ).run();
+  }
+
+  String _errorMessage(AuthenticationError error) {
+    final l10n = _buildContext.l10n;
+    return switch (error.statusCode) {
+      400 => l10n.signInSubmitErrorInvalidCredentials,
+      _ => l10n.signInSubmitErrorUnknown(error.statusCode),
+    };
   }
 }

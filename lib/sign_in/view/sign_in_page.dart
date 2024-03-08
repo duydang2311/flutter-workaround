@@ -15,6 +15,7 @@ class SignInPage extends StatelessWidget {
         minimum: const EdgeInsets.all(16),
         child: BlocProvider(
           create: (context) => SignInBloc(
+            buildContext: context,
             authenticationRepository:
                 RepositoryProvider.of<AuthenticationRepository>(context),
           ),
@@ -33,12 +34,17 @@ class SignInView extends StatelessWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     return BlocListener<SignInBloc, SignInState>(
-      listenWhen: (previous, current) => previous.status != current.status,
+      listenWhen: (previous, current) =>
+          previous.submission != current.submission,
       listener: (context, state) {
-        if (state.status.isFailure) {
+        if (state.submission.status.isFailure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(const SnackBar(content: Text('Sign in failed.')));
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.submission.errorMessage!),
+              ),
+            );
         }
       },
       child: Center(
@@ -134,11 +140,11 @@ class _SubmitButton extends StatelessWidget {
     final l10n = context.l10n;
     return BlocBuilder<SignInBloc, SignInState>(
       buildWhen: (previous, current) =>
-          previous.status != current.status ||
+          previous.submission != current.submission ||
           previous.isValid != current.isValid,
       builder: (context, state) {
         return ElevatedButton(
-          onPressed: !state.isValid || state.status.isInProgress
+          onPressed: !state.isValid || state.submission.status.isInProgress
               ? null
               : () {
                   context.read<SignInBloc>().add(const SignInSubmitted());
@@ -153,7 +159,7 @@ class _SubmitButton extends StatelessWidget {
             },
             switchInCurve: Curves.easeIn,
             switchOutCurve: Curves.easeOut,
-            child: state.status.isInProgress
+            child: state.submission.status.isInProgress
                 ? Container(
                     padding: const EdgeInsets.all(2),
                     width: 20,
