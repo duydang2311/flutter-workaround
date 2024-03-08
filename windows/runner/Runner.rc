@@ -95,7 +95,7 @@ BEGIN
             VALUE "InternalName", "workaround" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.example.verygoodcore.work-around. All rights reserved." "\0"
             VALUE "OriginalFilename", "workaround.exe" "\0"
-            VALUE "ProductName", "Work Around" "\0"
+            VALUE "ProductName", "Workaround" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
