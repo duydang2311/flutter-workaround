@@ -1,4 +1,4 @@
-part of 'router_bloc.dart';
+part of 'home_navigation_bloc.dart';
 
 sealed class RouterEvent extends Equatable {
   const RouterEvent();
