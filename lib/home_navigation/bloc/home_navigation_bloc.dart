@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-part 'router_event.dart';
-part 'router_state.dart';
+part 'home_navigation_event.dart';
+part 'home_navigation_state.dart';
 
 class HomeNavigationBloc extends Bloc<RouterEvent, HomeNavigationState> {
   HomeNavigationBloc(super.state) {
