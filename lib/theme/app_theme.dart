@@ -25,7 +25,6 @@ abstract class AppTheme {
   static ThemeData build(ColorScheme colorScheme) {
     return ThemeData(
       colorScheme: colorScheme,
-      appBarTheme: AppBarTheme(color: colorScheme.tertiaryContainer),
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
       ),

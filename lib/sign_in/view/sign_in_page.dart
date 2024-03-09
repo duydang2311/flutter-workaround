@@ -1,9 +1,13 @@
+import 'dart:collection';
+
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:go_router/go_router.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/sign_in/sign_in.dart';
+import 'package:workaround/theme/widgets/themed_app_bar.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
@@ -11,6 +15,7 @@ class SignInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const ThemedAppBar(title: 'Sign in'),
       body: SafeArea(
         minimum: const EdgeInsets.all(16),
         child: BlocProvider(
@@ -74,6 +79,18 @@ class _SignInView extends StatelessWidget {
               const SizedBox(
                 width: double.infinity,
                 child: _SubmitButton(),
+              ),
+              const SizedBox(height: 48),
+              Row(
+                children: [
+                  const Text('No account?'),
+                  TextButton(
+                    child: const Text("Let's sign up"),
+                    onPressed: () {
+                      context.push('/sign-up');
+                    },
+                  ),
+                ],
               ),
             ],
           ),
