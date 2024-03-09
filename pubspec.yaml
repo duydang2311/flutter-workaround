@@ -38,3 +38,19 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+dart_define:
+  variables:
+    - name: SUPABASE_URL
+      description: Supabase API URL
+      required: true
+    - name: SUPABASE_ANON_KEY
+      description: Supabase API key
+      required: true
+  flavors:
+    - name: production
+      description: The production flavor
+    - name: staging
+      description: The staging flavor
+    - name: development
+      description: The development flavor

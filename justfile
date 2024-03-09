@@ -3,11 +3,15 @@ set dotenv-load
 
 [windows]
 flutter +rest:
-    flutter {{rest}} --dart-define=SUPABASE_URL="$env:SUPABASE_URL" --dart-define=SUPABASE_ANON_KEY="$env:SUPABASE_ANON_KEY"
+    flutter {{rest}} --dart-define-from-file=dart_define.json
 
 [linux]
 flutter +rest:
-    flutter {{rest}} --dart-define=SUPABASE_URL=$SUPABASE_URL --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+    flutter {{rest}} --dart-define-from-file=dart_define.json
 
 run +rest:
     just flutter run {{rest}}
+
+[windows]
+dart_define:
+    dart_define generate --SUPABASE_URL $env:SUPABASE_URL --SUPABASE_ANON_KEY $env:SUPABASE_ANON_KEY --FLAVOR=development
