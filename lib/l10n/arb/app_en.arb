@@ -6,6 +6,7 @@
   },
   "brandName": "Workaround",
   "@_SIGN_IN": {},
+  "signInTitle": "Sign in",
   "signInHeading": "Let's sign you in.",
   "signInEmailLabel": "Email address *",
   "signInEmailHint": "Enter your email address",
@@ -26,6 +27,39 @@
   "signInSubmitErrorInvalidCredentials": "Invalid login credentials.",
   "signInSubmitErrorUnknown": "Cannot authenticate due to an unknown error (code: {code}).",
   "@signInSubmitErrorUnknown": {
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "signUpTitle": "Sign up",
+  "signUpHeading": "Let's create your account.",
+  "signUpEmailLabel": "Email address *",
+  "signUpEmailHint": "Enter your email address",
+  "signUpEmailErrorEmpty": "Please enter an email address.",
+  "signUpEmailErrorInvalid": "Please enter a valid email address.",
+  "signUpEmailErrorDuplicated": "The email has already been used.",
+  "signUpPasswordLabel": "Password *",
+  "signUpPasswordHint": "Enter your password",
+  "signUpPasswordErrorEmpty": "Please enter a password.",
+  "signUpPasswordErrorMinLength": "Please enter a password with at least {minLength} characters.",
+  "@signUpPasswordErrorMinLength": {
+    "placeholders": {
+      "minLength": {
+        "type": "int"
+      }
+    }
+  },
+  "signInNoAccount": "Don't have an account yet?",
+  "signInSignUp": "Sign up",
+  "signUpConfirmPasswordLabel": "Confirm password *",
+  "signUpConfirmPasswordHint": "Enter your password again",
+  "signUpConfirmPasswordErrorEmpty": "Please enter your password once again.",
+  "signUpConfirmPasswordErrorMismatch": "Please enter the password correctly.",
+  "signUpSubmit": "Sign up",
+  "signUpSubmitErrorUnknown": "Cannot sign up due to an unknown error (code: {code}).",
+  "@signUpSubmitErrorUnknown": {
     "placeholders": {
       "code": {
         "type": "int"

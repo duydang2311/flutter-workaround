@@ -36,6 +36,9 @@ dev_dependencies:
   very_good_analysis: ^5.1.0
 
 flutter:
+  assets:
+    - assets/images/illustration_balloon.png
+    - assets/images/illustration_sally.png
   uses-material-design: true
   generate: true
 

@@ -65,8 +65,10 @@ final class AppView extends StatefulWidget {
   State<StatefulWidget> createState() => _AppViewState();
 }
 
-CustomColors lightCustomColors = const CustomColors(danger: Color(0xFFE53935));
-CustomColors darkCustomColors = const CustomColors(danger: Color(0xFFEF9A9A));
+CustomColors lightCustomColors =
+    const CustomColors(danger: Color(0xFFE53935), tertiary: Color(0xFF405580));
+CustomColors darkCustomColors =
+    const CustomColors(danger: Color(0xFFEF9A9A), tertiary: Color(0xFF405580));
 
 final class _AppViewState extends State<AppView> {
   @override
@@ -83,7 +85,8 @@ final class _AppViewState extends State<AppView> {
           // (Optional) Customize the scheme as desired. For example, one might
           // want to use a brand color to override the dynamic [ColorScheme.secondary].
           lightColorScheme = lightColorScheme.copyWith(
-              secondary: AppTheme.lightColorScheme.primary);
+            secondary: AppTheme.lightColorScheme.primary,
+          );
           // (Optional) If applicable, harmonize custom colors.
           lightCustomColors = lightCustomColors.harmonized(lightColorScheme);
 
@@ -118,14 +121,17 @@ final class _AppViewState extends State<AppView> {
 class CustomColors extends ThemeExtension<CustomColors> {
   const CustomColors({
     required this.danger,
+    required this.tertiary,
   });
 
-  final Color? danger;
+  final Color danger;
+  final Color tertiary;
 
   @override
-  CustomColors copyWith({Color? danger}) {
+  CustomColors copyWith({Color? danger, Color? tertiary}) {
     return CustomColors(
       danger: danger ?? this.danger,
+      tertiary: tertiary ?? this.tertiary,
     );
   }
 
@@ -135,11 +141,15 @@ class CustomColors extends ThemeExtension<CustomColors> {
       return this;
     }
     return CustomColors(
-      danger: Color.lerp(danger, other.danger, t),
+      danger: Color.lerp(danger, other.danger, t)!,
+      tertiary: Color.lerp(tertiary, other.tertiary, t)!,
     );
   }
 
   CustomColors harmonized(ColorScheme dynamic) {
-    return copyWith(danger: danger!.harmonizeWith(dynamic.primary));
+    return copyWith(
+      danger: danger.harmonizeWith(dynamic.primary),
+      tertiary: tertiary.harmonizeWith(dynamic.primary),
+    );
   }
 }

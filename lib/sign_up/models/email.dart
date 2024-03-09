@@ -2,16 +2,18 @@ import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 import 'package:workaround/l10n/l10n.dart';
 
-enum EmailValidationError { empty, invalid }
+enum EmailValidationError { empty, invalid, duplicated }
 
 extension EmailValidationErrorX on EmailValidationError {
   String getMessage(BuildContext context) {
     final l10n = context.l10n;
     switch (this) {
       case EmailValidationError.empty:
-        return l10n.signInEmailErrorEmpty;
+        return l10n.signUpEmailErrorEmpty;
       case EmailValidationError.invalid:
-        return l10n.signInEmailErrorInvalid;
+        return l10n.signUpEmailErrorInvalid;
+      case EmailValidationError.duplicated:
+        return l10n.signUpEmailErrorDuplicated;
     }
   }
 }

@@ -2,55 +2,65 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:go_router/go_router.dart';
 import 'package:workaround/l10n/l10n.dart';
-import 'package:workaround/sign_in/sign_in.dart';
+import 'package:workaround/sign_up/bloc/sign_up_bloc.dart';
+import 'package:workaround/sign_up/models/models.dart';
 import 'package:workaround/theme/widgets/themed_app_bar.dart';
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+final class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
     return Scaffold(
-      appBar: ThemedAppBar(title: l10n.signInTitle),
+      appBar: ThemedAppBar(title: l10n.signUpTitle),
       body: SafeArea(
         minimum: const EdgeInsets.all(16),
         child: BlocProvider(
-          create: (context) => SignInBloc(
-            buildContext: context,
+          create: (context) => SignUpBloc(
             authenticationRepository:
                 RepositoryProvider.of<AuthenticationRepository>(context),
           ),
-          child: const _SignInView(),
+          child: const _SignUpView(),
         ),
       ),
     );
   }
 }
 
-class _SignInView extends StatelessWidget {
-  const _SignInView();
+final class _SignUpView extends StatelessWidget {
+  const _SignUpView();
+
+  void _error(BuildContext context, SubmissionError error) {
+    final l10n = context.l10n;
+    final message = switch (error) {
+      final SubmissionErrorUnknown unknown =>
+        l10n.signUpSubmitErrorUnknown(unknown.statusCode),
+    };
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    return BlocListener<SignInBloc, SignInState>(
-      listenWhen: (previous, current) =>
-          previous.submission != current.submission,
+
+    return BlocListener<SignUpBloc, SignUpState>(
       listener: (context, state) {
-        if (state.submission.status.isFailure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.submission.errorMessage!),
-              ),
-            );
+        if (state.submission.error != null) {
+          _error(context, state.submission.error!);
         }
       },
+      listenWhen: (previous, current) =>
+          previous.submission != current.submission,
       child: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -66,7 +76,7 @@ class _SignInView extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                l10n.signInHeading,
+                l10n.signUpHeading,
                 style: theme.textTheme.displayLarge,
                 textAlign: TextAlign.left,
               ),
@@ -74,27 +84,14 @@ class _SignInView extends StatelessWidget {
               const _EmailInput(),
               const SizedBox(height: 16),
               const _PasswordInput(),
+              const SizedBox(height: 16),
+              const _ConfirmPasswordInput(),
               const SizedBox(height: 32),
               const SizedBox(
                 width: double.infinity,
                 child: _SubmitButton(),
               ),
               const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(l10n.signInNoAccount),
-                    TextButton(
-                      child: Text(l10n.signInSignUp),
-                      onPressed: () {
-                        context.push('/sign-up');
-                      },
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -109,16 +106,16 @@ class _EmailInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return BlocBuilder<SignInBloc, SignInState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
       buildWhen: (previous, current) => previous.email != current.email,
       builder: (context, state) {
         return TextField(
-          key: const Key('signInView_emailInput_textField'),
+          key: const Key('signUpView_emailInput_textField'),
           onChanged: (email) =>
-              context.read<SignInBloc>().add(SignInEmailChanged(email)),
+              context.read<SignUpBloc>().add(SignUpEmailChanged(email: email)),
           decoration: InputDecoration(
-            labelText: l10n.signInEmailLabel,
-            hintText: l10n.signInEmailHint,
+            labelText: l10n.signUpEmailLabel,
+            hintText: l10n.signUpEmailHint,
             errorText: state.email.displayError?.getMessage(context),
           ),
         );
@@ -133,17 +130,45 @@ class _PasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return BlocBuilder<SignInBloc, SignInState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
       buildWhen: (previous, current) => previous.password != current.password,
       builder: (context, state) {
         return TextField(
-          key: const Key('signInView_passwordInput_textField'),
-          onChanged: (password) =>
-              context.read<SignInBloc>().add(SignInPasswordChanged(password)),
+          key: const Key('signUpView_passwordInput_textField'),
+          onChanged: (password) => context
+              .read<SignUpBloc>()
+              .add(SignUpPasswordChanged(password: password)),
           decoration: InputDecoration(
-            labelText: l10n.signInPasswordLabel,
-            hintText: l10n.signInPasswordHint,
+            labelText: l10n.signUpPasswordLabel,
+            hintText: l10n.signUpPasswordHint,
             errorText: state.password.displayError?.getMessage(context),
+          ),
+          obscureText: true,
+        );
+      },
+    );
+  }
+}
+
+class _ConfirmPasswordInput extends StatelessWidget {
+  const _ConfirmPasswordInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return BlocBuilder<SignUpBloc, SignUpState>(
+      buildWhen: (previous, current) =>
+          previous.confirmPassword != current.confirmPassword,
+      builder: (context, state) {
+        return TextField(
+          key: const Key('signUpView_confirmPasswordInput_textField'),
+          onChanged: (confirmPassword) => context.read<SignUpBloc>().add(
+                SignUpConfirmPasswordChanged(confirmPassword: confirmPassword),
+              ),
+          decoration: InputDecoration(
+            labelText: l10n.signUpConfirmPasswordLabel,
+            hintText: l10n.signUpConfirmPasswordHint,
+            errorText: state.confirmPassword.displayError?.getMessage(context),
           ),
           obscureText: true,
         );
@@ -158,7 +183,7 @@ class _SubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return BlocBuilder<SignInBloc, SignInState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
       buildWhen: (previous, current) =>
           previous.submission != current.submission ||
           previous.isValid != current.isValid,
@@ -167,7 +192,7 @@ class _SubmitButton extends StatelessWidget {
           onPressed: !state.isValid || state.submission.status.isInProgress
               ? null
               : () {
-                  context.read<SignInBloc>().add(const SignInSubmitted());
+                  context.read<SignUpBloc>().add(const SignUpSubmitted());
                 },
           child: AnimatedSwitcher(
             duration: Durations.medium2,
@@ -187,7 +212,7 @@ class _SubmitButton extends StatelessWidget {
                     child: const CircularProgressIndicator(),
                   )
                 : Text(
-                    l10n.signInSubmit,
+                    l10n.signUpSubmit,
                   ),
           ),
         );
