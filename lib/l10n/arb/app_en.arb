@@ -29,7 +29,7 @@
   "@signInSubmitErrorUnknown": {
     "placeholders": {
       "code": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -63,7 +63,7 @@
   "@signUpSubmitErrorUnknown": {
     "placeholders": {
       "code": {
-        "type": "int"
+        "type": "String"
       }
     }
   },

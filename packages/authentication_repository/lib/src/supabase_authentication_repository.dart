@@ -37,10 +37,8 @@ final class SupabaseAuthenticationRepository
   }) {
     return TaskEither<AuthenticationError, GoogleSignInAuthentication>.tryCatch(
       () async {
-        const webClientId =
-            '925364545663-2ufqljsno5d4p7e3vuqdn409gdvigcn0.apps.googleusercontent.com';
-        const iosClientId =
-            '925364545663-ki3uic5n6g2no61m2e3a4sbd01vh9p95.apps.googleusercontent.com';
+        const webClientId = '';
+        const iosClientId = '';
         final googleSignIn = GoogleSignIn(
           clientId: iosClientId,
           serverClientId: webClientId,
@@ -49,14 +47,13 @@ final class SupabaseAuthenticationRepository
         return googleUser!.authentication;
       },
       (error, stackTrace) {
-        print(error);
         return const AuthenticationError.unknown();
       },
     ).flatMap<GoogleSignInAuthentication>((googleAuth) {
       if (googleAuth.accessToken == null) {
         return TaskEither.left(
           const AuthenticationError(
-            statusCode: 0,
+            code: 'access_token_not_found',
             message: 'No access token found.',
           ),
         );
@@ -64,7 +61,7 @@ final class SupabaseAuthenticationRepository
       if (googleAuth.idToken == null) {
         return TaskEither.left(
           const AuthenticationError(
-            statusCode: 0,
+            code: 'id_token_not_found',
             message: 'No ID token found.',
           ),
         );

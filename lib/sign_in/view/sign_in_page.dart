@@ -211,7 +211,7 @@ class _SignInWithGoogleButton extends StatelessWidget {
       buildWhen: (previous, current) =>
           previous.googleSignInStatus != current.googleSignInStatus,
       builder: (context, state) {
-        return ElevatedButton(
+        return OutlinedButton(
           onPressed: state.googleSignInStatus == GoogleSignInStatus.pending
               ? null
               : () {
@@ -219,26 +219,37 @@ class _SignInWithGoogleButton extends StatelessWidget {
                       .read<SignInBloc>()
                       .add(const SignInWithGoogleRequested());
                 },
-          child: AnimatedSwitcher(
-            duration: Durations.medium2,
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return ScaleTransition(
-                scale: animation,
-                child: child,
-              );
-            },
-            switchInCurve: Curves.easeIn,
-            switchOutCurve: Curves.easeOut,
-            child: state.googleSignInStatus == GoogleSignInStatus.pending
-                ? Container(
-                    padding: const EdgeInsets.all(2),
-                    width: 20,
-                    height: 20,
-                    child: const CircularProgressIndicator(),
-                  )
-                : Text(
-                    l10n.signInWithGoogle,
-                  ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedSwitcher(
+                duration: Durations.medium2,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  );
+                },
+                switchInCurve: Curves.easeIn,
+                switchOutCurve: Curves.easeOut,
+                child: (state.googleSignInStatus == GoogleSignInStatus.pending)
+                    ? Container(
+                        padding: const EdgeInsets.all(2),
+                        width: 20,
+                        height: 20,
+                        child: const CircularProgressIndicator(),
+                      )
+                    : Image.asset(
+                        'assets/images/icon_google.png',
+                        width: 20,
+                        height: 20,
+                      ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.signInWithGoogle,
+              ),
+            ],
           ),
         );
       },

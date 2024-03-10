@@ -17,7 +17,7 @@ final class SupabaseAppUserRepository implements AppUserRepository {
   @override
   Stream<Option<AppUser>> get currentUserStream =>
       _supabase.client.auth.onAuthStateChange.map((state) {
-        if (state.session != null) _supabase.client.auth.signOut();
+        // if (state.session != null) _supabase.client.auth.signOut();
         return Option.fromNullable(state.session).map(
           (t) => AppUser(t.user.id),
         );

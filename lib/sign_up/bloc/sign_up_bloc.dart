@@ -83,6 +83,13 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     SignUpSubmitted event,
     Emitter<SignUpState> emit,
   ) async {
+    emit(
+      state.copyWith(
+        submission: const Submission(
+          status: FormzSubmissionStatus.inProgress,
+        ),
+      ),
+    );
     await _authenticationRepository
         .signUpWithEmailAndPassword(
       email: state.email.value,
@@ -107,15 +114,15 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   }
 
   SubmissionError _submissionError(AuthenticationError authError) {
-    switch (authError.statusCode) {
-      case 400:
+    switch (authError.code) {
+      case '400':
         return SubmissionErrorUnknown(
-          statusCode: authError.statusCode,
+          code: authError.code,
           message: authError.message,
         );
       default:
         return SubmissionErrorUnknown(
-          statusCode: authError.statusCode,
+          code: authError.code,
           message: authError.message,
         );
     }

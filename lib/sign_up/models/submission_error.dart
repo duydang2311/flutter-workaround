@@ -4,13 +4,13 @@ sealed class SubmissionError extends Equatable {}
 
 final class SubmissionErrorUnknown extends SubmissionError {
   SubmissionErrorUnknown({
-    required this.statusCode,
+    required this.code,
     required this.message,
   });
 
-  final int statusCode;
+  final String code;
   final String message;
 
   @override
-  List<Object?> get props => [statusCode, message];
+  List<Object?> get props => [code, message];
 }

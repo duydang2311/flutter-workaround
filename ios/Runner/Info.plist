@@ -62,14 +62,6 @@
 					<string>io.supabase.flutterquickstart</string>
 				</array>
 			</dict>
-			<dict>
-				<key>CFBundleTypeRole</key>
-				<string>Editor</string>
-				<key>CFBundleURLSchemes</key>
-				<array>
-					<string>com.googleusercontent.apps.925364545663-ki3uic5n6g2no61m2e3a4sbd01vh9p95</string>
-				</array>
-			</dict>
 		</array>
 	</dict>
 </plist>

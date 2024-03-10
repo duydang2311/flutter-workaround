@@ -104,9 +104,9 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
   String _errorMessage(AuthenticationError error) {
     final l10n = _buildContext.l10n;
-    return switch (error.statusCode) {
-      400 => l10n.signInSubmitErrorInvalidCredentials,
-      _ => l10n.signInSubmitErrorUnknown(error.statusCode),
+    return switch (error.code) {
+      '400' => l10n.signInSubmitErrorInvalidCredentials,
+      _ => l10n.signInSubmitErrorUnknown(error.code),
     };
   }
 

@@ -37,7 +37,7 @@ final class _SignUpView extends StatelessWidget {
     final l10n = context.l10n;
     final message = switch (error) {
       final SubmissionErrorUnknown unknown =>
-        l10n.signUpSubmitErrorUnknown(unknown.statusCode),
+        l10n.signUpSubmitErrorUnknown(unknown.code),
     };
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
