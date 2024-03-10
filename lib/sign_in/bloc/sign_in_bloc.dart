@@ -20,6 +20,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     on<SignInEmailChanged>(_onEmailChanged);
     on<SignInPasswordChanged>(_onPasswordChanged);
     on<SignInSubmitted>(_onSubmitted);
+    on<SignInWithGoogleRequested>(_onSignInWithGoogle);
   }
 
   final BuildContext _buildContext;
@@ -107,5 +108,20 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       400 => l10n.signInSubmitErrorInvalidCredentials,
       _ => l10n.signInSubmitErrorUnknown(error.statusCode),
     };
+  }
+
+  Future<void> _onSignInWithGoogle(
+    SignInWithGoogleRequested event,
+    Emitter<SignInState> emit,
+  ) async {
+    emit(state.copyWith(googleSignInStatus: GoogleSignInStatus.pending));
+    await _authenticationRepository.signInWithGoogle().match(
+      (l) {
+        emit(state.copyWith(googleSignInStatus: GoogleSignInStatus.failure));
+      },
+      (r) {
+        emit(state.copyWith(googleSignInStatus: GoogleSignInStatus.success));
+      },
+    ).run();
   }
 }

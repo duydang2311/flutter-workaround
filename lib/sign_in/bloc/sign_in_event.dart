@@ -28,3 +28,7 @@ final class SignInPasswordChanged extends SignInEvent {
 final class SignInSubmitted extends SignInEvent {
   const SignInSubmitted();
 }
+
+final class SignInWithGoogleRequested extends SignInEvent {
+  const SignInWithGoogleRequested();
+}

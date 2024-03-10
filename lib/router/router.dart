@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:workaround/home/view/home_page.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
 import 'package:workaround/sign_in/sign_in.dart';
-import 'package:workaround/sign_up/view/sign_up_page.dart';
+import 'package:workaround/sign_up/sign_up.dart';
 import 'package:workaround/splash/splash.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();

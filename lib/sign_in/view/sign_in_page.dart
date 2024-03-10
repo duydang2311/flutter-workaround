@@ -79,6 +79,11 @@ class _SignInView extends StatelessWidget {
                 width: double.infinity,
                 child: _SubmitButton(),
               ),
+              const SizedBox(height: 16),
+              const SizedBox(
+                width: double.infinity,
+                child: _SignInWithGoogleButton(),
+              ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -188,6 +193,51 @@ class _SubmitButton extends StatelessWidget {
                   )
                 : Text(
                     l10n.signInSubmit,
+                  ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SignInWithGoogleButton extends StatelessWidget {
+  const _SignInWithGoogleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return BlocBuilder<SignInBloc, SignInState>(
+      buildWhen: (previous, current) =>
+          previous.googleSignInStatus != current.googleSignInStatus,
+      builder: (context, state) {
+        return ElevatedButton(
+          onPressed: state.googleSignInStatus == GoogleSignInStatus.pending
+              ? null
+              : () {
+                  context
+                      .read<SignInBloc>()
+                      .add(const SignInWithGoogleRequested());
+                },
+          child: AnimatedSwitcher(
+            duration: Durations.medium2,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+            switchInCurve: Curves.easeIn,
+            switchOutCurve: Curves.easeOut,
+            child: state.googleSignInStatus == GoogleSignInStatus.pending
+                ? Container(
+                    padding: const EdgeInsets.all(2),
+                    width: 20,
+                    height: 20,
+                    child: const CircularProgressIndicator(),
+                  )
+                : Text(
+                    l10n.signInWithGoogle,
                   ),
           ),
         );

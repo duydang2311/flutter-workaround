@@ -33,6 +33,7 @@
       }
     }
   },
+  "signInWithGoogle": "Sign in with Google",
   "signUpTitle": "Sign up",
   "signUpHeading": "Let's create your account.",
   "signUpEmailLabel": "Email address *",
