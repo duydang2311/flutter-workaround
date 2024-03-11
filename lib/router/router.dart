@@ -14,7 +14,8 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const SplashPage(),
+      pageBuilder: (context, state) =>
+          const MaterialPage(key: ValueKey('splash'), child: SplashPage()),
     ),
     StatefulShellRoute.indexedStack(
       branches: [
@@ -44,65 +45,54 @@ final router = GoRouter(
           ],
         ),
       ],
-      pageBuilder: (context, state, navigationShell) =>
-          _fadeTransitionPageBuilder(
-        context: context,
-        state: state,
-        key: ValueKey(navigationShell.currentIndex),
-        child: BlocProvider(
-          create: (context) => HomeNavigationBloc(
-            HomeNavigationState(currentIndex: navigationShell.currentIndex),
-          ),
-          child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
-            listener: (context, state) {
-              navigationShell.goBranch(
-                state.currentIndex,
-                initialLocation:
-                    state.currentIndex == navigationShell.currentIndex,
-              );
-            },
-            child: Scaffold(
-              bottomNavigationBar: const HomeBottomNavigationBar(),
-              body: navigationShell,
-            ),
-          ),
+      builder: (context, state, navigationShell) => BlocProvider(
+        create: (context) => HomeNavigationBloc(
+          HomeNavigationState(currentIndex: navigationShell.currentIndex),
+        ),
+        child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
+          listener: (context, state) {
+            navigationShell.goBranch(
+              state.currentIndex,
+              initialLocation:
+                  state.currentIndex == navigationShell.currentIndex,
+            );
+          },
+          child: navigationShell,
         ),
       ),
-      // builder: (context, state, navigationShell) {
-      //   return BlocProvider(
-      //     create: (context) => HomeNavigationBloc(
-      //       HomeNavigationState(currentIndex: navigationShell.currentIndex),
-      //     ),
-      //     child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
-      //       listener: (context, state) {
-      //         navigationShell.goBranch(
-      //           state.currentIndex,
-      //           initialLocation:
-      //               state.currentIndex == navigationShell.currentIndex,
-      //         );
-      //       },
-      //       child: Scaffold(
-      //         bottomNavigationBar: const HomeBottomNavigationBar(),
-      //         body: navigationShell,
-      //       ),
-      //     ),
-      //   );
-      // },
+      pageBuilder: (context, state, navigationShell) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: BlocProvider(
+            create: (context) => HomeNavigationBloc(
+              HomeNavigationState(
+                currentIndex: navigationShell.currentIndex,
+              ),
+            ),
+            child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
+              listener: (context, state) {
+                navigationShell.goBranch(
+                  state.currentIndex,
+                  initialLocation:
+                      state.currentIndex == navigationShell.currentIndex,
+                );
+              },
+              child: navigationShell,
+            ),
+          ),
+        );
+      },
     ),
     GoRoute(
       path: '/sign-in',
-      pageBuilder: (context, state) => _fadeTransitionPageBuilder(
-        context: context,
-        state: state,
-        child: const SignInPage(),
+      pageBuilder: (context, state) => const MaterialPage(
+        child: SignInPage(),
       ),
     ),
     GoRoute(
       path: '/sign-up',
-      pageBuilder: (context, state) => _fadeTransitionPageBuilder(
-        context: context,
-        state: state,
-        child: const SignUpPage(),
+      pageBuilder: (context, state) => const MaterialPage(
+        child: SignUpPage(),
       ),
     ),
   ],
@@ -117,21 +107,3 @@ final router = GoRouter(
   //   return null;
   // },
 );
-
-CustomTransitionPage<T> _fadeTransitionPageBuilder<T extends Widget>({
-  required BuildContext context,
-  required GoRouterState state,
-  required T child,
-  LocalKey? key,
-}) {
-  return CustomTransitionPage(
-    key: key,
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(
-        opacity: CurveTween(curve: Curves.easeInOutQuad).animate(animation),
-        child: child,
-      );
-    },
-  );
-}
