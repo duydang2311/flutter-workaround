@@ -13,6 +13,12 @@ class DartDefine {
   /// Supabase API key
   static const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
+  /// Google OAuth web client ID
+  static const googleOauthWebClientId = String.fromEnvironment('GOOGLE_OAUTH_WEB_CLIENT_ID');
+
+  /// Google OAuth iOS client ID
+  static const googleOauthIosClientId = String.fromEnvironment('GOOGLE_OAUTH_IOS_CLIENT_ID');
+
 }
 
 /// The flavors supported by the application

@@ -8,11 +8,17 @@ final class SupabaseAuthenticationRepository
   const SupabaseAuthenticationRepository({
     required Supabase supabase,
     required String supabaseRedirectUrl,
+    required String webClientId,
+    required String iosClientId,
   })  : _supabase = supabase,
-        _supabaseRedirectUrl = supabaseRedirectUrl;
+        _supabaseRedirectUrl = supabaseRedirectUrl,
+        _webClientId = webClientId,
+        _iosClientId = iosClientId;
 
   final Supabase _supabase;
   final String _supabaseRedirectUrl;
+  final String _webClientId;
+  final String _iosClientId;
 
   @override
   TaskEither<AuthenticationError, void> signInWithEmailAndPassword({
@@ -37,11 +43,9 @@ final class SupabaseAuthenticationRepository
   }) {
     return TaskEither<AuthenticationError, GoogleSignInAuthentication>.tryCatch(
       () async {
-        const webClientId = '';
-        const iosClientId = '';
         final googleSignIn = GoogleSignIn(
-          clientId: iosClientId,
-          serverClientId: webClientId,
+          clientId: _iosClientId,
+          serverClientId: _webClientId,
         );
         final googleUser = await googleSignIn.signIn();
         return googleUser!.authentication;

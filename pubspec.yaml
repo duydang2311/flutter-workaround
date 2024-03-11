@@ -51,6 +51,12 @@ dart_define:
     - name: SUPABASE_ANON_KEY
       description: Supabase API key
       required: true
+    - name: GOOGLE_OAUTH_WEB_CLIENT_ID
+      description: Google OAuth web client ID
+      required: true
+    - name: GOOGLE_OAUTH_IOS_CLIENT_ID
+      description: Google OAuth iOS client ID
+      required: true
   flavors:
     - name: production
       description: The production flavor

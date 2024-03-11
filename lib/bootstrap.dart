@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:workaround/dart_define.gen.dart';
 
 class _AppBlocObserver extends BlocObserver {
   const _AppBlocObserver();
@@ -30,8 +31,8 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   Bloc.observer = const _AppBlocObserver();
 
   await Supabase.initialize(
-    url: const String.fromEnvironment('SUPABASE_URL'),
-    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    url: DartDefine.supabaseUrl,
+    anonKey: DartDefine.supabaseAnonKey,
   );
   runApp(await builder());
 }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:workaround/authentication/bloc/authentication_bloc.dart';
+import 'package:workaround/dart_define.gen.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/router/router.dart';
 import 'package:workaround/theme/theme.dart';
@@ -27,6 +28,8 @@ final class _AppState extends State<App> {
     _authenticationRepository = SupabaseAuthenticationRepository(
       supabase: _supabase,
       supabaseRedirectUrl: 'io.supabase.flutterquickstart://login-callback/',
+      webClientId: DartDefine.googleOauthWebClientId,
+      iosClientId: DartDefine.googleOauthIosClientId,
     );
     _userRepository = SupabaseAppUserRepository(
       supabase: _supabase,
