@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,7 +24,7 @@ final class ThemedAppBar extends StatelessWidget
       backgroundColor: theme.colorScheme.primaryContainer,
       leading: context.canPop()
           ? IconButton(
-              icon: const Icon(CupertinoIcons.arrow_left),
+              icon: const Icon(Icons.arrow_left),
               onPressed: context.pop,
             )
           : null,

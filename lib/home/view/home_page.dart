@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workaround/home_navigation/home_navigation.dart';
 
 final class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,6 +10,7 @@ final class HomePage extends StatelessWidget {
       body: SafeArea(
         child: _HomeView(),
       ),
+      bottomNavigationBar: HomeBottomNavigationBar(),
     );
   }
 }
@@ -18,6 +20,6 @@ final class _HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('home');
+    return const Center(child: Text('Home'));
   }
 }

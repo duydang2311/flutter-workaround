@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
@@ -14,17 +13,17 @@ final class HomeBottomNavigationBar extends StatelessWidget {
       _NavigationItem(
         location: '/home',
         label: l10n.homeBottomNavHomeLabel,
-        icon: const Icon(CupertinoIcons.home),
+        icon: const Icon(Icons.home),
       ),
       _NavigationItem(
         location: '/profile',
         label: l10n.homeBottomNavProfileLabel,
-        icon: const Icon(CupertinoIcons.person_circle),
+        icon: const Icon(Icons.person),
       ),
       _NavigationItem(
         location: '/settings',
         label: l10n.homeBottomNavSettingsLabel,
-        icon: const Icon(CupertinoIcons.settings),
+        icon: const Icon(Icons.settings),
       ),
     ];
 
