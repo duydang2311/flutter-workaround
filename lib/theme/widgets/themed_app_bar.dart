@@ -24,7 +24,7 @@ final class ThemedAppBar extends StatelessWidget
       backgroundColor: theme.colorScheme.primaryContainer,
       leading: context.canPop()
           ? IconButton(
-              icon: const Icon(Icons.arrow_left),
+              icon: const Icon(Icons.chevron_left),
               onPressed: context.pop,
             )
           : null,
