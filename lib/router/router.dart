@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workaround/home/view/home_page.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
+import 'package:workaround/profile/view/profile_page.dart';
 import 'package:workaround/sign_in/sign_in.dart';
 import 'package:workaround/sign_up/sign_up.dart';
 import 'package:workaround/splash/splash.dart';
@@ -31,7 +32,7 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: '/profile',
-              builder: (context, state) => const Center(child: Text('Profile')),
+              builder: (context, state) => const ProfilePage(),
             ),
           ],
         ),

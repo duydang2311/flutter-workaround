@@ -17,7 +17,7 @@ class AuthenticationBloc
         _userRepository = userRepository,
         super(const AuthenticationState.unknown()) {
     on<_AuthenticationStatusChanged>(_onAuthenticationStatusChanged);
-    on<AuthenticationLogoutRequested>(_onAuthenticationLogoutRequested);
+    on<AuthenticationSignOutRequested>(_onAuthenticationLogoutRequested);
     _authenticationStatusSubscription = _userRepository.currentUserStream
         .map(
           (appUser) => appUser.match(
@@ -58,7 +58,7 @@ class AuthenticationBloc
   }
 
   Future<void> _onAuthenticationLogoutRequested(
-    AuthenticationLogoutRequested event,
+    AuthenticationSignOutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
     await _authenticationRepository.signOut().run();

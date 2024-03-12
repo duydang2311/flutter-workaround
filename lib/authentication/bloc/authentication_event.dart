@@ -10,4 +10,6 @@ final class _AuthenticationStatusChanged extends AuthenticationEvent {
   final AuthenticationStatus status;
 }
 
-final class AuthenticationLogoutRequested extends AuthenticationEvent {}
+final class AuthenticationSignOutRequested extends AuthenticationEvent {
+  const AuthenticationSignOutRequested();
+}
