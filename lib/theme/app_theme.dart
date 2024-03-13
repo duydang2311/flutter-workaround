@@ -32,7 +32,7 @@ abstract class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -40,7 +40,7 @@ abstract class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -59,6 +59,11 @@ abstract class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         selectedItemColor: colorScheme.primary,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+      ),
+      listTileTheme: const ListTileThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
       ),
       useMaterial3: true,
     );

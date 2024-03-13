@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
 import 'package:workaround/l10n/l10n.dart';
 
 final class HomeBottomNavigationBar extends StatelessWidget {
-  const HomeBottomNavigationBar({super.key});
+  const HomeBottomNavigationBar({required this.navigationShell, super.key});
+
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +40,11 @@ final class HomeBottomNavigationBar extends StatelessWidget {
                     BottomNavigationBarItem(icon: item.icon, label: item.label),
               )
               .toList(),
-          onTap: (int index) {
-            context.read<HomeNavigationBloc>().add(
-                  HomeNavigationBranchChangeRequested(
-                    index: index,
-                  ),
-                );
+          onTap: (index) {
+            context
+                .read<HomeNavigationBloc>()
+                .add(HomeNavigationBranchChangeRequested(index: index));
+            navigationShell.goBranch(index);
           },
         );
       },

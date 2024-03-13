@@ -5,7 +5,7 @@ import 'package:formz/formz.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/sign_up/bloc/sign_up_bloc.dart';
 import 'package:workaround/sign_up/models/models.dart';
-import 'package:workaround/theme/widgets/themed_app_bar.dart';
+import 'package:workaround/theme/theme.dart';
 
 final class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -15,7 +15,7 @@ final class SignUpPage extends StatelessWidget {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: ThemedAppBar(title: l10n.signUpTitle),
+      appBar: ThemedAppBar(title: ThemedAppBarTitle(l10n.signUpTitle)),
       body: SafeArea(
         minimum: const EdgeInsets.all(16),
         child: BlocProvider(
@@ -205,12 +205,7 @@ class _SubmitButton extends StatelessWidget {
             switchInCurve: Curves.easeIn,
             switchOutCurve: Curves.easeOut,
             child: state.submission.status.isInProgress
-                ? Container(
-                    padding: const EdgeInsets.all(2),
-                    width: 20,
-                    height: 20,
-                    child: const CircularProgressIndicator(),
-                  )
+                ? const ThemedCircularProgressIndicator()
                 : Text(
                     l10n.signUpSubmit,
                   ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:workaround/edit_profile/view/edit_profile_page.dart';
 import 'package:workaround/home/view/home_page.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
+import 'package:workaround/home_navigation/widgets/home_scaffold.dart';
 import 'package:workaround/profile/view/profile_page.dart';
 import 'package:workaround/sign_in/sign_in.dart';
 import 'package:workaround/sign_up/sign_up.dart';
@@ -33,6 +35,15 @@ final router = GoRouter(
             GoRoute(
               path: '/profile',
               builder: (context, state) => const ProfilePage(),
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  pageBuilder: (context, state) => const MaterialPage(
+                    key: ValueKey('edit_profile'),
+                    child: EditProfilePage(),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -46,21 +57,6 @@ final router = GoRouter(
           ],
         ),
       ],
-      builder: (context, state, navigationShell) => BlocProvider(
-        create: (context) => HomeNavigationBloc(
-          HomeNavigationState(currentIndex: navigationShell.currentIndex),
-        ),
-        child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
-          listener: (context, state) {
-            navigationShell.goBranch(
-              state.currentIndex,
-              initialLocation:
-                  state.currentIndex == navigationShell.currentIndex,
-            );
-          },
-          child: navigationShell,
-        ),
-      ),
       pageBuilder: (context, state, navigationShell) {
         return MaterialPage(
           key: state.pageKey,
@@ -72,13 +68,13 @@ final router = GoRouter(
             ),
             child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
               listener: (context, state) {
-                navigationShell.goBranch(
-                  state.currentIndex,
-                  initialLocation:
-                      state.currentIndex == navigationShell.currentIndex,
-                );
+                // navigationShell.goBranch(
+                //   state.currentIndex,
+                //   initialLocation:
+                //       state.currentIndex == navigationShell.currentIndex,
+                // );
               },
-              child: navigationShell,
+              child: HomeScaffold(navigationShell: navigationShell),
             ),
           ),
         );

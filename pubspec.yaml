@@ -25,6 +25,9 @@ dependencies:
   infrastructure:
     path: packages/infrastructure
   intl: ^0.18.1
+  profile_repository:
+    path: packages/profile_repository
+  random_avatar: ^0.0.8
   supabase_flutter: ^2.3.4
   user_repository:
     path: packages/user_repository
