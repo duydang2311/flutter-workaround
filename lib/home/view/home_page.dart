@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:workaround/home_navigation/home_navigation.dart';
+import 'package:workaround/theme/theme.dart';
 
 final class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SafeArea(
-        child: _HomeView(),
-      ),
-      bottomNavigationBar: HomeBottomNavigationBar(),
+    return const ThemedScaffoldBody(
+      child: _HomeView(),
     );
   }
 }

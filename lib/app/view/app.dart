@@ -2,6 +2,7 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:profile_repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:workaround/authentication/bloc/authentication_bloc.dart';
@@ -20,7 +21,8 @@ final class App extends StatefulWidget {
 final class _AppState extends State<App> {
   late final AuthenticationRepository _authenticationRepository;
   late final Supabase _supabase;
-  late final AppUserRepository _userRepository;
+  late final AppUserRepository _appUserRepository;
+  late final ProfileRepository _profileRepository;
 
   @override
   void initState() {
@@ -31,20 +33,26 @@ final class _AppState extends State<App> {
       webClientId: DartDefine.googleOauthWebClientId,
       iosClientId: DartDefine.googleOauthIosClientId,
     );
-    _userRepository = SupabaseAppUserRepository(
+    _appUserRepository = SupabaseAppUserRepository(
       supabase: _supabase,
     );
+    _profileRepository = SupabaseProfileRepository(
+        supabase: _supabase, appUserRepository: _appUserRepository);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: _authenticationRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: _authenticationRepository),
+        RepositoryProvider.value(value: _appUserRepository),
+        RepositoryProvider.value(value: _profileRepository),
+      ],
       child: BlocProvider(
         create: (_) => AuthenticationBloc(
           authenticationRepository: _authenticationRepository,
-          userRepository: _userRepository,
+          userRepository: _appUserRepository,
         ),
         child: BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
@@ -68,10 +76,8 @@ final class AppView extends StatefulWidget {
   State<StatefulWidget> createState() => _AppViewState();
 }
 
-CustomColors lightCustomColors =
-    const CustomColors(danger: Color(0xFFE53935), tertiary: Color(0xFF405580));
-CustomColors darkCustomColors =
-    const CustomColors(danger: Color(0xFFEF9A9A), tertiary: Color(0xFF405580));
+CustomColors lightCustomColors = const CustomColors(danger: Color(0xFFE53935));
+CustomColors darkCustomColors = const CustomColors(danger: Color(0xFFEF9A9A));
 
 final class _AppViewState extends State<AppView> {
   @override
@@ -84,20 +90,20 @@ final class _AppViewState extends State<AppView> {
         if (lightDynamic != null && darkDynamic != null) {
           // On Android S+ devices, use the provided dynamic color scheme.
           // (Recommended) Harmonize the dynamic color scheme' built-in semantic colors.
-          lightColorScheme = lightDynamic.harmonized();
+          lightColorScheme = AppTheme.lighterOutline(lightDynamic.harmonized());
           // (Optional) Customize the scheme as desired. For example, one might
           // want to use a brand color to override the dynamic [ColorScheme.secondary].
-          lightColorScheme = lightColorScheme.copyWith(
-            secondary: AppTheme.lightColorScheme.primary,
-          );
+          // lightColorScheme = lightColorScheme.copyWith(
+          //   secondary: AppTheme.lightColorScheme.primary,
+          // );
           // (Optional) If applicable, harmonize custom colors.
           lightCustomColors = lightCustomColors.harmonized(lightColorScheme);
 
           // Repeat for the dark color scheme.
-          darkColorScheme = darkDynamic.harmonized();
-          darkColorScheme = darkColorScheme.copyWith(
-            secondary: AppTheme.darkColorScheme.primary,
-          );
+          darkColorScheme = AppTheme.darkerOutline(darkDynamic.harmonized());
+          // darkColorScheme = darkColorScheme.copyWith(
+          //   secondary: AppTheme.darkColorScheme.primary,
+          // );
           darkCustomColors = darkCustomColors.harmonized(darkColorScheme);
         } else {
           // Otherwise, use fallback schemes.
@@ -124,17 +130,14 @@ final class _AppViewState extends State<AppView> {
 class CustomColors extends ThemeExtension<CustomColors> {
   const CustomColors({
     required this.danger,
-    required this.tertiary,
   });
 
   final Color danger;
-  final Color tertiary;
 
   @override
-  CustomColors copyWith({Color? danger, Color? tertiary}) {
+  CustomColors copyWith({Color? danger}) {
     return CustomColors(
       danger: danger ?? this.danger,
-      tertiary: tertiary ?? this.tertiary,
     );
   }
 
@@ -145,14 +148,12 @@ class CustomColors extends ThemeExtension<CustomColors> {
     }
     return CustomColors(
       danger: Color.lerp(danger, other.danger, t)!,
-      tertiary: Color.lerp(tertiary, other.tertiary, t)!,
     );
   }
 
   CustomColors harmonized(ColorScheme dynamic) {
     return copyWith(
       danger: danger.harmonizeWith(dynamic.primary),
-      tertiary: tertiary.harmonizeWith(dynamic.primary),
     );
   }
 }
