@@ -4,24 +4,22 @@ import 'package:go_router/go_router.dart';
 final class ThemedAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   const ThemedAppBar({
-    required this.title,
+    this.title,
+    this.actions,
     super.key,
   });
 
-  final String title;
+  final Widget? title;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AppBar(
-      title: Text(
-        title,
-        style: theme.textTheme.titleLarge!.copyWith(
-          color: theme.colorScheme.onPrimaryContainer,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
+      title: title,
+      actions: actions,
       backgroundColor: theme.colorScheme.primaryContainer,
+      automaticallyImplyLeading: false,
       leading: context.canPop()
           ? IconButton(
               icon: const Icon(Icons.chevron_left),

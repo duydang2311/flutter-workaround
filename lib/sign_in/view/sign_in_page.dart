@@ -5,7 +5,7 @@ import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/sign_in/sign_in.dart';
-import 'package:workaround/theme/widgets/themed_app_bar.dart';
+import 'package:workaround/theme/theme.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
@@ -14,7 +14,7 @@ class SignInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      appBar: ThemedAppBar(title: l10n.signInTitle),
+      appBar: ThemedAppBar(title: ThemedAppBarTitle(l10n.signInTitle)),
       body: SafeArea(
         minimum: const EdgeInsets.all(16),
         child: BlocProvider(
@@ -185,12 +185,7 @@ class _SubmitButton extends StatelessWidget {
             switchInCurve: Curves.easeIn,
             switchOutCurve: Curves.easeOut,
             child: state.submission.status.isInProgress
-                ? Container(
-                    padding: const EdgeInsets.all(2),
-                    width: 20,
-                    height: 20,
-                    child: const CircularProgressIndicator(),
-                  )
+                ? const ThemedCircularProgressIndicator()
                 : Text(
                     l10n.signInSubmit,
                   ),
@@ -233,12 +228,7 @@ class _SignInWithGoogleButton extends StatelessWidget {
                 switchInCurve: Curves.easeIn,
                 switchOutCurve: Curves.easeOut,
                 child: (state.googleSignInStatus == GoogleSignInStatus.pending)
-                    ? Container(
-                        padding: const EdgeInsets.all(2),
-                        width: 20,
-                        height: 20,
-                        child: const CircularProgressIndicator(),
-                      )
+                    ? const ThemedCircularProgressIndicator()
                     : Image.asset(
                         'assets/images/icon_google.png',
                         width: 20,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workaround/theme/theme.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
@@ -6,7 +7,7 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+      body: Center(child: ThemedCircularProgressIndicator()),
     );
   }
 }
