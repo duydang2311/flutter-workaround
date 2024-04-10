@@ -25,7 +25,7 @@ dependencies:
   infrastructure:
     path: packages/infrastructure
   intl: ^0.18.1
-  supabase_flutter: ^2.4.0
+  supabase_flutter: ^2.5.0
   user_repository:
     path: packages/user_repository
 
