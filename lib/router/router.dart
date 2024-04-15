@@ -5,6 +5,7 @@ import 'package:workaround/edit_profile/view/edit_profile_page.dart';
 import 'package:workaround/home/view/home_page.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
 import 'package:workaround/home_navigation/widgets/home_scaffold.dart';
+import 'package:workaround/map/view/map_page.dart';
 import 'package:workaround/profile/view/profile_page.dart';
 import 'package:workaround/sign_in/sign_in.dart';
 import 'package:workaround/sign_up/sign_up.dart';
@@ -27,6 +28,14 @@ final router = GoRouter(
             GoRoute(
               path: '/home',
               builder: (context, state) => const HomePage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/maps',
+              builder: (context, state) => const MapPage(),
             ),
           ],
         ),
@@ -66,16 +75,7 @@ final router = GoRouter(
                 currentIndex: navigationShell.currentIndex,
               ),
             ),
-            child: BlocListener<HomeNavigationBloc, HomeNavigationState>(
-              listener: (context, state) {
-                // navigationShell.goBranch(
-                //   state.currentIndex,
-                //   initialLocation:
-                //       state.currentIndex == navigationShell.currentIndex,
-                // );
-              },
-              child: HomeScaffold(navigationShell: navigationShell),
-            ),
+            child: HomeScaffold(navigationShell: navigationShell),
           ),
         );
       },

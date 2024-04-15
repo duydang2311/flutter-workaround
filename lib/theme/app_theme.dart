@@ -59,6 +59,9 @@ abstract class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         selectedItemColor: colorScheme.primary,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+        unselectedItemColor: colorScheme.surfaceVariant,
+        type: BottomNavigationBarType.fixed,
+        showUnselectedLabels: false,
       ),
       listTileTheme: const ListTileThemeData(
         shape: RoundedRectangleBorder(

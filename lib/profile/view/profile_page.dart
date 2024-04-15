@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:workaround/authentication/authentication.dart';
-import 'package:workaround/home_navigation/home_navigation.dart';
 import 'package:workaround/profile/bloc/profile_bloc.dart';
 import 'package:workaround/profile/models/models.dart';
 import 'package:workaround/theme/theme.dart';

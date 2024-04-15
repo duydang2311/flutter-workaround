@@ -19,6 +19,11 @@ final class HomeBottomNavigationBar extends StatelessWidget {
         icon: const Icon(Icons.home),
       ),
       _NavigationItem(
+        location: '/maps',
+        label: 'Map',
+        icon: const Icon(Icons.map),
+      ),
+      _NavigationItem(
         location: '/profile',
         label: l10n.homeBottomNavProfileLabel,
         icon: const Icon(Icons.person),
