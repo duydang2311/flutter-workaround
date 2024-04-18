@@ -14,19 +14,15 @@ final class ThemedAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return AppBar(
       title: title,
       actions: actions,
-      backgroundColor: theme.colorScheme.primaryContainer,
-      automaticallyImplyLeading: false,
       leading: context.canPop()
           ? IconButton(
               icon: const Icon(Icons.chevron_left),
               onPressed: context.pop,
             )
           : null,
-      forceMaterialTransparency: true,
     );
   }
 

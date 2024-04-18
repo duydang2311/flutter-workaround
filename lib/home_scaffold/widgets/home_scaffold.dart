@@ -43,17 +43,19 @@ final class HomeScaffold extends StatelessWidget {
               navigationShell.shellRouteContext.routerState.topRoute?.name];
           return Scaffold(
             appBar: scaffoldData?.appBar,
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: navigationShell.currentIndex,
-              items: items
+            bottomNavigationBar: NavigationBar(
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
+              selectedIndex: navigationShell.currentIndex,
+              destinations: items
                   .map(
-                    (item) => BottomNavigationBarItem(
+                    (item) => NavigationDestination(
                       icon: item.icon,
                       label: item.label,
                     ),
                   )
                   .toList(),
-              onTap: (index) {
+              onDestinationSelected: (index) {
                 navigationShell.goBranch(
                   index,
                   initialLocation: index == navigationShell.currentIndex,

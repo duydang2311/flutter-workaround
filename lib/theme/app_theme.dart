@@ -56,13 +56,6 @@ abstract class AppTheme {
       ),
       progressIndicatorTheme:
           const ProgressIndicatorThemeData(linearMinHeight: 2),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        selectedItemColor: colorScheme.primary,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
-        unselectedItemColor: colorScheme.surfaceVariant,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: false,
-      ),
       listTileTheme: const ListTileThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
