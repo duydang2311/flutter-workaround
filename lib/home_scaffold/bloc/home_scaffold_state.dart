@@ -1,16 +1,16 @@
-part of 'home_navigation_bloc.dart';
+part of 'home_scaffold_bloc.dart';
 
-final class HomeNavigationState extends Equatable {
-  const HomeNavigationState({
+final class HomeScaffoldState extends Equatable {
+  const HomeScaffoldState({
     required this.scaffoldMap,
   });
 
-  static const HomeNavigationState empty = HomeNavigationState(scaffoldMap: {});
+  static const HomeScaffoldState empty = HomeScaffoldState(scaffoldMap: {});
 
   final Map<String, ScaffoldData> scaffoldMap;
 
-  HomeNavigationState copyWith({Map<String, ScaffoldData>? scaffoldMap}) =>
-      HomeNavigationState(scaffoldMap: scaffoldMap ?? this.scaffoldMap);
+  HomeScaffoldState copyWith({Map<String, ScaffoldData>? scaffoldMap}) =>
+      HomeScaffoldState(scaffoldMap: scaffoldMap ?? this.scaffoldMap);
 
   @override
   List<Object?> get props => [scaffoldMap];

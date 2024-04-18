@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:workaround/home_navigation/home_navigation.dart';
+import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:workaround/l10n/l10n.dart';
 
 final class HomeScaffold extends StatelessWidget {
@@ -35,9 +35,9 @@ final class HomeScaffold extends StatelessWidget {
       ),
     ];
 
-    return BlocProvider<HomeNavigationBloc>(
-      create: (context) => HomeNavigationBloc(HomeNavigationState.empty),
-      child: BlocBuilder<HomeNavigationBloc, HomeNavigationState>(
+    return BlocProvider<HomeScaffoldBloc>(
+      create: (context) => HomeScaffoldBloc(HomeScaffoldState.empty),
+      child: BlocBuilder<HomeScaffoldBloc, HomeScaffoldState>(
         builder: (context, state) {
           final scaffoldData = state.scaffoldMap[
               navigationShell.shellRouteContext.routerState.topRoute?.name];

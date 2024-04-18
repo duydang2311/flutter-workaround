@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:workaround/home_navigation/home_navigation.dart';
+import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:workaround/theme/theme.dart';
 
 final class CreateWorkPage extends StatelessWidget {
@@ -8,9 +8,9 @@ final class CreateWorkPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<HomeNavigationBloc>();
+    final bloc = context.read<HomeScaffoldBloc>();
     bloc.add(
-      HomeNavigationStateChanged(
+      HomeScaffoldChanged(
         scaffoldMap: {
           ...bloc.state.scaffoldMap,
           'create-work': const ScaffoldData(
