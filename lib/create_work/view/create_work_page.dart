@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:workaround/home_navigation/home_navigation.dart';
 import 'package:workaround/theme/theme.dart';
 
-final class EditProfilePage extends StatelessWidget {
-  const EditProfilePage({super.key});
+final class CreateWorkPage extends StatelessWidget {
+  const CreateWorkPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,25 +13,25 @@ final class EditProfilePage extends StatelessWidget {
       HomeNavigationStateChanged(
         scaffoldMap: {
           ...bloc.state.scaffoldMap,
-          'edit-profile': const ScaffoldData(
+          'create-work': const ScaffoldData(
             appBar: ThemedAppBar(
-              title: ThemedAppBarTitle('Edit profile'),
+              title: ThemedAppBarTitle('Create work'),
             ),
           ),
         },
       ),
     );
     return const ThemedScaffoldBody(
-      child: _EditProfileView(),
+      child: _CreateWorkView(),
     );
   }
 }
 
-final class _EditProfileView extends StatelessWidget {
-  const _EditProfileView();
+final class _CreateWorkView extends StatelessWidget {
+  const _CreateWorkView();
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Hello'));
+    return const Center(child: Text('Create a work...'));
   }
 }

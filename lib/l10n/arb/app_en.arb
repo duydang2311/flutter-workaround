@@ -68,6 +68,7 @@
     }
   },
   "homeBottomNavHomeLabel": "Home",
+  "homeBottomNavMapLabel": "Map",
   "homeBottomNavProfileLabel": "Profile",
   "homeBottomNavSettingsLabel": "Settings"
 }

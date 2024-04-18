@@ -1,17 +1,23 @@
 part of 'home_navigation_bloc.dart';
 
-sealed class RouterEvent extends Equatable {
-  const RouterEvent();
+sealed class HomeNavigationEvent extends Equatable {
+  const HomeNavigationEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class HomeNavigationBranchChangeRequested extends RouterEvent {
-  const HomeNavigationBranchChangeRequested({required this.index});
+final class HomeNavigationStateChanged extends HomeNavigationEvent {
+  const HomeNavigationStateChanged({
+    required this.scaffoldMap,
+  });
 
-  final int index;
+  final Map<String, ScaffoldData> scaffoldMap;
 
   @override
-  List<Object?> get props => [index];
+  List<Object?> get props => [scaffoldMap];
+}
+
+final class HomeNavigationCreateWorkRequested extends HomeNavigationEvent {
+  const HomeNavigationCreateWorkRequested();
 }

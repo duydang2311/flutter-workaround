@@ -1,18 +1,23 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 part 'home_navigation_event.dart';
 part 'home_navigation_state.dart';
 
-class HomeNavigationBloc extends Bloc<RouterEvent, HomeNavigationState> {
+class HomeNavigationBloc
+    extends Bloc<HomeNavigationEvent, HomeNavigationState> {
   HomeNavigationBloc(super.state) {
-    on<HomeNavigationBranchChangeRequested>(_handleRouterPathChangeRequested);
+    on<HomeNavigationStateChanged>(_handleStateChanged);
   }
 
-  void _handleRouterPathChangeRequested(
-    HomeNavigationBranchChangeRequested event,
+  void _handleStateChanged(
+    HomeNavigationStateChanged event,
     Emitter<HomeNavigationState> emit,
   ) {
-    emit(state.copyWith(currentIndex: event.index));
+    log('home_navigation_bloc ${event.scaffoldMap}');
+    emit(state.copyWith(scaffoldMap: event.scaffoldMap));
   }
 }
