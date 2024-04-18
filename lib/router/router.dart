@@ -33,14 +33,16 @@ final router = GoRouter(
               name: 'home',
               path: '/home',
               builder: (context, state) => const HomePage(),
-            ),
-            GoRoute(
-              name: 'create-work',
-              path: '/create-work',
-              pageBuilder: (context, state) => const MaterialPage(
-                key: ValueKey('create-work'),
-                child: CreateWorkPage(),
-              ),
+              routes: [
+                GoRoute(
+                  name: 'create-work',
+                  path: 'create-work',
+                  pageBuilder: (context, state) => const MaterialPage(
+                    key: ValueKey('create-work'),
+                    child: CreateWorkPage(),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -28,7 +28,7 @@ final class _HomeView extends StatelessWidget {
           'home': ScaffoldData(
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                context.push('/create-work');
+                context.pushNamed('create-work');
               },
               child: const Icon(Icons.add),
             ),
