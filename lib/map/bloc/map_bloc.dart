@@ -8,13 +8,7 @@ part 'map_state.dart';
 class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc()
       : super(
-          const MapState(
-            controller: null,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(10.823099, 106.629662),
-              zoom: 14.4746,
-            ),
-          ),
+          const MapState(controller: null),
         ) {
     on<MapCreated>(_handleMapCreated);
   }

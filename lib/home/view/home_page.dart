@@ -26,6 +26,7 @@ final class _HomeView extends StatelessWidget {
         scaffoldMap: {
           ...bloc.state.scaffoldMap,
           'home': ScaffoldData(
+            appBar: const ThemedAppBar(),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 context.pushNamed('create-work');

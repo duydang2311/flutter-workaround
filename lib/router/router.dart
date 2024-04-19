@@ -21,6 +21,7 @@ final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   routes: [
     GoRoute(
+      name: 'splash',
       path: '/',
       pageBuilder: (context, state) =>
           const MaterialPage(key: ValueKey('splash'), child: SplashPage()),
@@ -48,6 +49,7 @@ final router = GoRouter(
           navigatorKey: _mapNavigatorKey,
           routes: [
             GoRoute(
+              name: 'map',
               path: '/maps',
               builder: (context, state) => const MapPage(),
             ),
@@ -57,6 +59,7 @@ final router = GoRouter(
           navigatorKey: _profileNavigatorKey,
           routes: [
             GoRoute(
+              name: 'profile',
               path: '/profile',
               builder: (context, state) => const ProfilePage(),
               routes: [
@@ -76,6 +79,7 @@ final router = GoRouter(
           navigatorKey: _settingsNavigatorKey,
           routes: [
             GoRoute(
+              name: 'settings',
               path: '/settings',
               builder: (context, state) =>
                   const Center(child: Text('Settings')),

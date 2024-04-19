@@ -72,11 +72,9 @@ final class _NavigationItem {
     required this.location,
     required this.label,
     required this.icon,
-    this.floatingActionButton,
   });
 
   final String location;
   final String label;
   final Icon icon;
-  final Widget? floatingActionButton;
 }

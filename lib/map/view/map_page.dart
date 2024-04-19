@@ -22,9 +22,14 @@ final class _MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MapBloc, MapState>(
-      builder: (context, state) => GoogleMap(
-        initialCameraPosition: state.initialCameraPosition,
+    const initialCameraPosition = CameraPosition(
+      target: LatLng(10.823099, 106.629662),
+      zoom: 14.4746,
+    );
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.background,
+      child: GoogleMap(
+        initialCameraPosition: initialCameraPosition,
         zoomControlsEnabled: false,
         compassEnabled: false,
         mapToolbarEnabled: false,
