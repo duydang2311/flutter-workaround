@@ -87,43 +87,40 @@ final class _ProfileStats extends StatelessWidget {
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        'General',
-                        style: theme.textTheme.titleLarge,
+                child: Column(
+                  children: [
+                    Text(
+                      'General',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.person_rounded,
                       ),
-                      const SizedBox(height: 16),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.person_rounded,
-                        ),
-                        title: const Text('Edit profile'),
-                        subtitle: const Text(
-                            'Change profile picture, display name, phone number...'),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          context.push('/profile/edit');
-                        },
-                      ),
-                      Divider(
-                        color: theme.colorScheme.outline,
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.exit_to_app_rounded),
-                        title: const Text('Sign out'),
-                        subtitle: const Text(
-                            'Log out of the current session and navigate back to sign in page.'),
-                        onTap: () {
-                          context
-                              .read<AuthenticationBloc>()
-                              .add(const AuthenticationSignOutRequested());
-                        },
-                      ),
-                    ],
-                  ),
+                      title: const Text('Edit profile'),
+                      subtitle: const Text(
+                          'Change profile picture, display name, phone number...'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        context.push('/profile/edit');
+                      },
+                    ),
+                    Divider(
+                      color: theme.colorScheme.outline,
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.exit_to_app_rounded),
+                      title: const Text('Sign out'),
+                      subtitle: const Text(
+                          'Log out of the current session and navigate back to sign in page.'),
+                      onTap: () {
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(const AuthenticationSignOutRequested());
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],

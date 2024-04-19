@@ -29,10 +29,13 @@ abstract class AppTheme {
       fontFamily: GoogleFonts.sourceSans3().fontFamily,
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -40,7 +43,7 @@ abstract class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

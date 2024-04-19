@@ -32,6 +32,8 @@ dependencies:
   supabase_flutter: ^2.4.0
   user_repository:
     path: packages/user_repository
+  work_repository:
+    path: packages/work_repository
 
 dev_dependencies:
   bloc_test: ^9.1.7

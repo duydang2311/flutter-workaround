@@ -38,10 +38,7 @@ final router = GoRouter(
                 GoRoute(
                   name: 'create-work',
                   path: 'create-work',
-                  pageBuilder: (context, state) => const MaterialPage(
-                    key: ValueKey('create-work'),
-                    child: CreateWorkPage(),
-                  ),
+                  builder: (context, state) => const CreateWorkPage(),
                 ),
               ],
             ),

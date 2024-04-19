@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:work_repository/work_repository.dart';
 import 'package:workaround/authentication/bloc/authentication_bloc.dart';
 import 'package:workaround/dart_define.gen.dart';
 import 'package:workaround/l10n/l10n.dart';
@@ -23,6 +24,7 @@ final class _AppState extends State<App> {
   late final Supabase _supabase;
   late final AppUserRepository _appUserRepository;
   late final ProfileRepository _profileRepository;
+  late final WorkRepository _workRepository;
 
   @override
   void initState() {
@@ -37,7 +39,10 @@ final class _AppState extends State<App> {
       supabase: _supabase,
     );
     _profileRepository = SupabaseProfileRepository(
-        supabase: _supabase, appUserRepository: _appUserRepository);
+      supabase: _supabase,
+      appUserRepository: _appUserRepository,
+    );
+    _workRepository = SupabaseWorkRepository(supabase: _supabase);
     super.initState();
   }
 
@@ -48,6 +53,7 @@ final class _AppState extends State<App> {
         RepositoryProvider.value(value: _authenticationRepository),
         RepositoryProvider.value(value: _appUserRepository),
         RepositoryProvider.value(value: _profileRepository),
+        RepositoryProvider.value(value: _workRepository),
       ],
       child: BlocProvider(
         create: (_) => AuthenticationBloc(

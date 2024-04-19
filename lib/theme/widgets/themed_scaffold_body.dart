@@ -1,34 +1,26 @@
 import 'package:flutter/material.dart';
 
 final class ThemedScaffoldBody extends StatelessWidget {
-  const ThemedScaffoldBody({required this.child, super.key});
+  const ThemedScaffoldBody({
+    required this.child,
+    this.middle = true,
+    super.key,
+  });
 
   final Widget child;
+  final bool middle;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: child,
-          ),
-        ),
+    Widget widget = SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: child,
       ),
     );
-    // return SafeArea(
-    //   child: CustomScrollView(
-    //     slivers: [
-    //       SliverFillRemaining(
-    //         hasScrollBody: false,
-    //         child: Padding(
-    //           padding: const EdgeInsets.all(8),
-    //           child: child,
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
+    if (middle) widget = Center(child: widget);
+    return SafeArea(
+      child: widget,
+    );
   }
 }
