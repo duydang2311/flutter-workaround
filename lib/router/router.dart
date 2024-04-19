@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workaround/create_work/create_work.dart';
 import 'package:workaround/edit_profile/edit_profile.dart';
@@ -88,7 +89,10 @@ final router = GoRouter(
       pageBuilder: (context, state, navigationShell) {
         return NoTransitionPage(
           key: state.pageKey,
-          child: HomeScaffold(navigationShell: navigationShell),
+          child: BlocProvider<HomeScaffoldBloc>(
+            create: (context) => HomeScaffoldBloc(HomeScaffoldState.empty),
+            child: HomeScaffold(navigationShell: navigationShell),
+          ),
         );
       },
     ),
