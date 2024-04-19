@@ -49,7 +49,7 @@ final class _CreateWorkView extends StatelessWidget {
         children: [
           Text(
             'Fill in the form to create a work.',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
           const _TitleInput(),
