@@ -107,8 +107,8 @@ class _DescriptionInput extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.always,
           ),
           keyboardType: TextInputType.multiline,
-          minLines: 4,
-          maxLines: null,
+          minLines: 6,
+          maxLines: 6,
         );
       },
     );

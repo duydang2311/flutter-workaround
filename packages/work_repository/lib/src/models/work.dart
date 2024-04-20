@@ -6,6 +6,8 @@ final class Work extends Equatable {
     this.ownerId = '',
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.lat = 0,
+    this.lng = 0,
     this.title = '',
     this.description,
   })  : createdAt = createdAt ?? DateTime.now().toUtc(),
@@ -30,6 +32,8 @@ final class Work extends Equatable {
   final String ownerId;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final double lat;
+  final double lng;
   final String title;
   final String? description;
 

@@ -10,10 +10,11 @@ final class SupabaseWorkRepository implements WorkRepository {
   @override
   TaskEither<SaveWorkError, void> insertWork(Work work) {
     return TaskEither.tryCatch(
-      () => _supabase.client.from('works').insert({
+      () => _supabase.client.from('public.works').insert({
         'owner_id': work.ownerId,
         'title': work.title,
         'description': work.description,
+        'location': 'point(${work.lat} ${work.lng})',
       }),
       _catch,
     );
