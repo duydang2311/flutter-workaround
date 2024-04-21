@@ -15,7 +15,8 @@
         "--target",
         "lib/main_development.dart",
         "--dart-define-from-file",
-        "dart_define.json"
+        "dart_define.json",
+        "-v"
       ]
     },
     {

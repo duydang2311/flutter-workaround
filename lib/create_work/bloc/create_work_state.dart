@@ -6,26 +6,31 @@ final class CreateWorkState extends Equatable {
     this.title = const Title.pure(),
     this.description = const Description.pure(),
     this.isValid = false,
+    this.location = const Location(),
   });
 
   final Submission submission;
   final Title title;
   final Description description;
   final bool isValid;
+  final Location location;
 
   CreateWorkState copyWith({
     Submission? submission,
     Title? title,
     Description? description,
     bool? isValid,
+    Location? location,
   }) =>
       CreateWorkState(
         submission: submission ?? this.submission,
         title: title ?? this.title,
         description: description ?? this.description,
         isValid: isValid ?? this.isValid,
+        location: location ?? this.location,
       );
 
   @override
-  List<Object> get props => [submission, title, description, isValid];
+  List<Object?> get props =>
+      [submission, title, description, isValid, location];
 }

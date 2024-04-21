@@ -7,6 +7,10 @@ sealed class CreateWorkEvent extends Equatable {
   List<Object> get props => [];
 }
 
+final class CreateWorkInitialized extends CreateWorkEvent {
+  const CreateWorkInitialized();
+}
+
 final class CreateWorkTitleChanged extends CreateWorkEvent {
   const CreateWorkTitleChanged({required this.title});
 
@@ -23,6 +27,19 @@ final class CreateWorkDescriptionChanged extends CreateWorkEvent {
 
   @override
   List<Object> get props => [description];
+}
+
+final class CreateWorkLocationChanged extends CreateWorkEvent {
+  const CreateWorkLocationChanged({
+    required this.position,
+    required this.address,
+  });
+
+  final Position position;
+  final String address;
+
+  @override
+  List<Object> get props => [position, address];
 }
 
 final class CreateWorkSubmitted extends CreateWorkEvent {
