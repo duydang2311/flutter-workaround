@@ -35,9 +35,10 @@ final class ConfirmPasswordErrorMismatch
 
 final class ConfirmPassword
     extends FormzInput<String, ConfirmPasswordValidationError> {
-  const ConfirmPassword.pure(
-      [super.value = '', this.original = const Password.pure()])
-      : super.pure();
+  const ConfirmPassword.pure([
+    super.value = '',
+    this.original = const Password.pure(),
+  ]) : super.pure();
   const ConfirmPassword.dirty({required this.original, String value = ''})
       : super.dirty(value);
 

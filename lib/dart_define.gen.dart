@@ -19,6 +19,12 @@ class DartDefine {
   /// Google OAuth iOS client ID
   static const googleOauthIosClientId = String.fromEnvironment('GOOGLE_OAUTH_IOS_CLIENT_ID');
 
+  /// Google API key for Android
+  static const androidGoogleApiKey = String.fromEnvironment('ANDROID_GOOGLE_API_KEY');
+
+  /// Goong API key
+  static const goongApiKey = String.fromEnvironment('GOONG_API_KEY');
+
 }
 
 /// The flavors supported by the application

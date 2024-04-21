@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:cronet_http/cronet_http.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
+import 'package:http/io_client.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
@@ -25,6 +30,7 @@ final class _AppState extends State<App> {
   late final AppUserRepository _appUserRepository;
   late final ProfileRepository _profileRepository;
   late final WorkRepository _workRepository;
+  late final Client _httpClient;
 
   @override
   void initState() {
@@ -43,6 +49,17 @@ final class _AppState extends State<App> {
       appUserRepository: _appUserRepository,
     );
     _workRepository = SupabaseWorkRepository(supabase: _supabase);
+    if (Platform.isAndroid) {
+      final engine = CronetEngine.build(
+        cacheMode: CacheMode.memory,
+        cacheMaxSize: 2 * 1024 * 1024,
+        userAgent: 'Workaround Agent',
+      );
+      _httpClient = CronetClient.fromCronetEngine(engine, closeEngine: true);
+    } else {
+      _httpClient = IOClient(HttpClient()..userAgent = 'Workaround Agent');
+    }
+
     super.initState();
   }
 
@@ -54,6 +71,7 @@ final class _AppState extends State<App> {
         RepositoryProvider.value(value: _appUserRepository),
         RepositoryProvider.value(value: _profileRepository),
         RepositoryProvider.value(value: _workRepository),
+        RepositoryProvider.value(value: _httpClient),
       ],
       child: BlocProvider(
         create: (_) => AuthenticationBloc(

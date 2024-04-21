@@ -10,6 +10,7 @@ dependencies:
   authentication_repository:
     path: packages/authentication_repository
   bloc: ^8.1.4
+  cronet_http: ^1.2.0
   dynamic_color: ^1.7.0
   equatable: ^2.0.5
   flutter:
@@ -19,16 +20,20 @@ dependencies:
     sdk: flutter
   formz: ^0.7.0
   fpdart: ^1.1.0
+  geocoding: ^3.0.0
+  geolocator: ^11.0.0
   go_router: ^13.2.4
   google_fonts: ^6.2.1
   google_maps_flutter: ^2.6.0
   google_sign_in: ^6.2.1
+  http: ^1.2.1
   infrastructure:
     path: packages/infrastructure
   intl: ^0.18.1
   profile_repository:
     path: packages/profile_repository
   random_avatar: ^0.0.8
+  stream_transform: ^2.1.0
   supabase_flutter: ^2.4.0
   user_repository:
     path: packages/user_repository
@@ -63,6 +68,12 @@ dart_define:
       required: true
     - name: GOOGLE_OAUTH_IOS_CLIENT_ID
       description: Google OAuth iOS client ID
+      required: true
+    - name: ANDROID_GOOGLE_API_KEY
+      description: Google API key for Android
+      required: true
+    - name: GOONG_API_KEY
+      description: Goong API key
       required: true
   flavors:
     - name: production

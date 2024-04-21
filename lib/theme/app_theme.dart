@@ -8,8 +8,8 @@ abstract class AppTheme {
 
   static ColorScheme lighterOutline(ColorScheme colorScheme) =>
       colorScheme.copyWith(
-        outline: _lighten(lightColorScheme.outline, 0.3),
-        outlineVariant: _lighten(lightColorScheme.outlineVariant, 0.3),
+        outline: _lighten(lightColorScheme.outline, 0.4),
+        outlineVariant: _lighten(lightColorScheme.outlineVariant, 0.1),
       );
 
   static final darkColorScheme = ColorScheme.fromSeed(
@@ -20,7 +20,7 @@ abstract class AppTheme {
   static ColorScheme darkerOutline(ColorScheme colorScheme) =>
       colorScheme.copyWith(
         outline: _darken(lightColorScheme.outline, 0.2),
-        outlineVariant: _darken(lightColorScheme.outlineVariant, 0.2),
+        outlineVariant: _darken(lightColorScheme.outlineVariant, 0.1),
       );
 
   static ThemeData build(ColorScheme colorScheme) {
@@ -47,6 +47,11 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
       ),
       inputDecorationTheme: const InputDecorationTheme(
