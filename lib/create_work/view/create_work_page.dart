@@ -46,6 +46,9 @@ final class CreateWorkPage extends StatelessWidget {
         ),
       ],
       child: BlocListener<BottomSheetBloc, BottomSheetState>(
+        listenWhen: (previous, current) =>
+            previous.selectedTimestamp != current.selectedTimestamp ||
+            previous.selected != current.selected,
         listener: (context, state) {
           context
               .read<CreateWorkBloc>()

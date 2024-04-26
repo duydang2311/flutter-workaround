@@ -23,6 +23,7 @@ class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
             suggestions: [],
             pending: false,
             selected: Option.none(),
+            selectedTimestamp: 0,
           ),
         ) {
     on<BottomSheetAddressChanged>(_handleAddressChanged);
@@ -121,6 +122,8 @@ class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
         selected: event.index == -1
             ? const Option.none()
             : Option.of(state.suggestions[event.index]),
+        selectedTimestamp:
+            event.index == -1 ? DateTime.now().millisecondsSinceEpoch : null,
       ),
     );
   }
