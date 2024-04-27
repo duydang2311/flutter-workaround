@@ -6,6 +6,8 @@ import 'package:formz/formz.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart';
+import 'package:location_client/location_client.dart';
+import 'package:shared_kernel/shared_kernel.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/create_work/create_work.dart';
@@ -17,9 +19,11 @@ part 'create_work_state.dart';
 class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
   CreateWorkBloc({
     required Client client,
+    required LocationClient locationClient,
     required AppUserRepository appUserRepository,
     required WorkRepository workRepository,
   })  : _client = client,
+        _locationClient = locationClient,
         _workRepository = workRepository,
         _appUserRepository = appUserRepository,
         super(const CreateWorkState()) {
@@ -31,6 +35,7 @@ class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
   }
 
   final Client _client;
+  final LocationClient _locationClient;
   final WorkRepository _workRepository;
   final AppUserRepository _appUserRepository;
 
@@ -38,19 +43,19 @@ class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
     CreateWorkInitialized event,
     Emitter<CreateWorkState> emit,
   ) async {
-    if (!await TaskOption.tryCatch(Geolocator.isLocationServiceEnabled)
-        .getOrElse(() => false)
-        .run()) {
-      return;
-    }
+    // if (!await TaskOption.tryCatch(Geolocator.isLocationServiceEnabled)
+    //     .getOrElse(() => false)
+    //     .run()) {
+    //   return;
+    // }
 
-    await TaskOption.tryCatch(Geolocator.checkPermission)
-        .flatMap(
-          (permission) => permission == LocationPermission.denied
-              ? TaskOption.tryCatch(Geolocator.requestPermission)
-              : TaskOption<LocationPermission>.none(),
-        )
-        .run();
+    // await TaskOption.tryCatch(Geolocator.checkPermission)
+    //     .flatMap(
+    //       (permission) => permission == LocationPermission.denied
+    //           ? TaskOption.tryCatch(Geolocator.requestPermission)
+    //           : TaskOption<LocationPermission>.none(),
+    //     )
+    //     .run();
   }
 
   void _handleTitleChanged(
@@ -84,74 +89,115 @@ class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
   ) async {
     emit(
       state.copyWith(
-        place: await event.suggestion
-            .match(
-              () => TaskOption.tryCatch(
-                () => Geolocator.getCurrentPosition(
-                  desiredAccuracy: LocationAccuracy.high,
-                ),
-              )
-                  .flatMap(
-                    (position) => TaskOption.tryCatch(
-                      () => _client.get(
-                        Uri.https(
-                          'rsapi.goong.io',
-                          '/Geocode',
-                          {
-                            'latlng':
-                                '${position.latitude}, ${position.longitude}',
-                            'api_key': DartDefine.goongApiKey,
-                          },
+        place: Option.fromEither(
+          await event.suggestion
+              .match(
+                () => _locationClient
+                    .checkPermission()
+                    .toTaskEither<GenericError>()
+                    .flatMap<LocationPermission>(
+                      (r) => switch (r) {
+                        LocationPermission.denied =>
+                          _locationClient.requestPermission(),
+                        LocationPermission.deniedForever =>
+                          TaskEither.left(GenericError(
+                            message:
+                                'Location permission has been denied forever.',
+                          )),
+                        LocationPermission.always ||
+                        LocationPermission.whileInUse =>
+                          TaskEither.right(r),
+                        _ => TaskEither.left(const GenericError.unknown()),
+                      },
+                    )
+                    .flatMap<Position>(
+                      (r) => switch (r) {
+                        LocationPermission.always ||
+                        LocationPermission.whileInUse =>
+                          _locationClient.getCurrentPosition(),
+                        _ => TaskEither.left(
+                            const GenericError(
+                              message: 'Could not get device location.',
+                            ),
+                          ),
+                      },
+                    )
+                    .flatMap(
+                      (position) => TaskEither.tryCatch(
+                        () => _client.get(
+                          Uri.https(
+                            'rsapi.goong.io',
+                            '/Geocode',
+                            {
+                              'latlng':
+                                  '${position.latitude}, ${position.longitude}',
+                              'api_key': DartDefine.goongApiKey,
+                            },
+                          ),
+                        ),
+                        (error, _) => switch (error) {
+                          final Exception e => GenericError.fromException(e),
+                          _ => const GenericError.unknown(),
+                        },
+                      ),
+                    )
+                    .map(
+                      (response) => jsonDecode(utf8.decode(response.bodyBytes))
+                          as Map<String, dynamic>,
+                    )
+                    .flatMap(
+                      (json) => TaskEither.fromNullable(
+                        (json['results'] as List?)?.first
+                            as Map<String, dynamic>?,
+                        () => const GenericError(
+                          message: 'Could not convert JSON.',
                         ),
                       ),
-                    ),
-                  )
-                  .map(
-                    (response) => jsonDecode(utf8.decode(response.bodyBytes))
-                        as Map<String, dynamic>,
-                  )
-                  .flatMap(
-                    (json) => TaskOption.fromNullable(
-                      (json['results'] as List?)?.first
-                          as Map<String, dynamic>?,
-                    ),
-                  )
-                  .map(Place.fromJson),
-              (suggestion) => TaskOption.tryCatch(
-                () => _client.get(
-                  Uri.https(
-                    'rsapi.goong.io',
-                    '/Place/Detail',
-                    {
-                      'place_id': suggestion.placeId,
-                      'api_key': DartDefine.goongApiKey,
-                    },
+                    )
+                    .map(Place.fromJson),
+                (suggestion) => TaskEither.tryCatch(
+                        () => _client.get(
+                              Uri.https(
+                                'rsapi.goong.io',
+                                '/Place/Detail',
+                                {
+                                  'place_id': suggestion.placeId,
+                                  'api_key': DartDefine.goongApiKey,
+                                },
+                              ),
+                            ),
+                        (error, _) => switch (error) {
+                              final Exception e =>
+                                GenericError.fromException(e),
+                              _ => const GenericError.unknown(),
+                            })
+                    .map(
+                      (r) => jsonDecode(utf8.decode(r.bodyBytes))
+                          as Map<String, dynamic>,
+                    )
+                    .flatMap(
+                      (json) => TaskEither.fromNullable(
+                        json['result'] as Map<String, dynamic>?,
+                        () => const GenericError(
+                          message: 'Could not convert response.',
+                        ),
+                      ),
+                    )
+                    .map(Place.fromJson),
+              )
+              .orElse<GenericError>(
+                (error) => TaskEither.right(
+                  Place(
+                    id: '',
+                    lat: 0,
+                    lng: 0,
+                    address: '',
+                    errorMessage: Option.of(error.message),
                   ),
                 ),
               )
-                  .map(
-                    (r) => jsonDecode(utf8.decode(r.bodyBytes))
-                        as Map<String, dynamic>,
-                  )
-                  .flatMap(
-                    (json) => TaskOption.fromNullable(
-                      json['result'] as Map<String, dynamic>?,
-                    ),
-                  )
-                  .map(Place.fromJson),
-            )
-            .orElse<Place>(
-              () => TaskOption.of(
-                const Place(
-                  id: '',
-                  lat: 0,
-                  lng: 0,
-                  address: '',
-                  errorMessage: Option.of('Could not retrieve your address'),
-                ),
-              ),
-            )
-            .run(),
+              .run(),
+        ),
       ),
     );
   }

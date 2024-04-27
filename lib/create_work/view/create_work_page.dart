@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:http/http.dart';
+import 'package:location_client/location_client.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/create_work/bloc/bottom_sheet_bloc.dart';
@@ -34,6 +35,7 @@ final class CreateWorkPage extends StatelessWidget {
         BlocProvider(
           create: (context) => CreateWorkBloc(
             client: RepositoryProvider.of<Client>(context),
+            locationClient: RepositoryProvider.of<LocationClient>(context),
             workRepository: RepositoryProvider.of<WorkRepository>(context),
             appUserRepository:
                 RepositoryProvider.of<AppUserRepository>(context),
@@ -42,6 +44,7 @@ final class CreateWorkPage extends StatelessWidget {
         BlocProvider(
           create: (context) => BottomSheetBloc(
             RepositoryProvider.of<Client>(context),
+            RepositoryProvider.of<LocationClient>(context),
           ),
         ),
       ],
