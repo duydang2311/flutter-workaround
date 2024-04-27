@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:infrastructure/infrastructure.dart';
+import 'package:shared_kernel/shared_kernel.dart';
 import 'package:work_repository/src/models/nearby_work.dart';
 import 'package:work_repository/work_repository.dart';
 

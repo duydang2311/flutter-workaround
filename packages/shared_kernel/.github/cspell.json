@@ -15,7 +15,5 @@
     }
   ],
   "useGitignore": true,
-  "words": [
-    "infrastructure"
-  ]
+  "words": ["shared_kernel"]
 }

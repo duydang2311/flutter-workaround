@@ -27,12 +27,12 @@ dependencies:
   google_maps_flutter: ^2.6.0
   google_sign_in: ^6.2.1
   http: ^1.2.1
-  infrastructure:
-    path: packages/infrastructure
   intl: ^0.18.1
   profile_repository:
     path: packages/profile_repository
   random_avatar: ^0.0.8
+  shared_kernel:
+    path: packages/shared_kernel
   stream_transform: ^2.1.0
   supabase_flutter: ^2.4.0
   user_repository:

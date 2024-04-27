@@ -13,6 +13,6 @@ dev_dependencies:
 dependencies:
   equatable: ^2.0.5
   fpdart: ^1.1.0
-  infrastructure:
-    path: ../infrastructure
+  shared_kernel:
+    path: ../shared_kernel
   supabase_flutter: ^2.5.1

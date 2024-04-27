@@ -1,4 +1,4 @@
-import 'package:infrastructure/infrastructure.dart';
+import 'package:shared_kernel/shared_kernel.dart';
 
 final class AuthenticationError extends SupabaseError {
   const AuthenticationError({

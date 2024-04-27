@@ -11,6 +11,6 @@ dev_dependencies:
 dependencies:
   fpdart: ^1.1.0
   google_sign_in: ^6.2.1
-  infrastructure:
-    path: ../infrastructure
+  shared_kernel:
+    path: ../shared_kernel
   supabase_flutter: ^2.3.4
