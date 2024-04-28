@@ -16,3 +16,7 @@ final class MapCreated extends MapEvent {
 
   final GoogleMapController controller;
 }
+
+final class MapChanged extends MapEvent {
+  const MapChanged();
+}

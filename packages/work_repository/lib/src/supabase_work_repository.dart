@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -5,9 +8,19 @@ import 'package:work_repository/src/models/nearby_work.dart';
 import 'package:work_repository/work_repository.dart';
 
 final class SupabaseWorkRepository implements WorkRepository {
-  SupabaseWorkRepository({required Supabase supabase}) : _supabase = supabase;
+  SupabaseWorkRepository({required Supabase supabase}) : _supabase = supabase {
+    _streamController = new StreamController<PostgresChangePayload>.broadcast(
+      onListen: _handleStreamListen,
+      onCancel: _handleStreamCancel,
+    );
+  }
 
   final Supabase _supabase;
+  late final StreamController<PostgresChangePayload> _streamController;
+  late final RealtimeChannel _insertRealtimeChannel;
+
+  @override
+  Stream<PostgresChangePayload> get stream => _streamController.stream;
 
   @override
   TaskEither<SaveWorkError, void> insertWork(Work work) {
@@ -72,5 +85,33 @@ final class SupabaseWorkRepository implements WorkRepository {
       final Exception e => GenericError.fromException(e),
       _ => const GenericError.unknown()
     };
+  }
+
+  void _handleStreamListen() {
+    log('_handleStreamListen');
+    _insertRealtimeChannel = _supabase.client
+        .channel('works')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'works',
+            callback: _handleStream)
+        .subscribe((status, object) {
+      log('[SupabaseWorkRepository] _handleStreamListen: $status, $object');
+    });
+  }
+
+  void _handleStreamCancel() {
+    TaskEither.tryCatch(_insertRealtimeChannel.unsubscribe, (error, _) => error)
+        .match((l) {
+      log('[SupabaseWorkRepository] _handleStreamCancel: $l');
+    }, (r) {
+      log('[SupabaseWorkRepository] _handleStreamCancel: ok');
+    }).run();
+  }
+
+  void _handleStream(PostgresChangePayload payload) {
+    _streamController.sink.add(payload);
+    log('[SupabaseWorkRepository] _handleStream: $payload');
   }
 }
