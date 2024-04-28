@@ -39,7 +39,7 @@ final class CreateWorkPage extends StatelessWidget {
             workRepository: RepositoryProvider.of<WorkRepository>(context),
             appUserRepository:
                 RepositoryProvider.of<AppUserRepository>(context),
-          )..add(const CreateWorkInitialized()),
+          ),
         ),
         BlocProvider(
           create: (context) => BottomSheetBloc(

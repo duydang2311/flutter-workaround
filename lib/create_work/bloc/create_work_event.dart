@@ -7,10 +7,6 @@ sealed class CreateWorkEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class CreateWorkInitialized extends CreateWorkEvent {
-  const CreateWorkInitialized();
-}
-
 final class CreateWorkTitleChanged extends CreateWorkEvent {
   const CreateWorkTitleChanged({required this.title});
 
