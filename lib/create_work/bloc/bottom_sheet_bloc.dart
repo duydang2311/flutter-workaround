@@ -33,22 +33,20 @@ class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
     on<BottomSheetSuggestionsChanged>(_handleSuggestionsChanged);
     on<BottomSheetPendingChanged>(_handlePendingChanged);
     on<BottomSheetLocationSelected>(_handleLocationSelected);
-    _suggestionStreamSubscription = _suggestionStreamController.stream
+    _suggestionStreamController.stream
         .debounce(const Duration(milliseconds: 500))
         .listen(_handleAddressSuggestion);
-  }
-
-  @override
-  Future<void> close() async {
-    await _suggestionStreamSubscription.cancel();
-    await _suggestionStreamController.close();
-    return super.close();
   }
 
   final StreamController<String> _suggestionStreamController;
   final Client _client;
   final LocationClient _locationClient;
-  late final StreamSubscription<String> _suggestionStreamSubscription;
+
+  @override
+  Future<void> close() async {
+    await _suggestionStreamController.close();
+    return super.close();
+  }
 
   Future<void> _handleAddressChanged(
     BottomSheetAddressChanged event,
@@ -56,7 +54,7 @@ class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
   ) async {
     emit(state.copyWith(address: Address.dirty(event.address), pending: true));
     if (_suggestionStreamController.hasListener) {
-      _suggestionStreamController.add(event.address);
+      _suggestionStreamController.sink.add(event.address);
     }
   }
 
