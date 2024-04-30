@@ -38,7 +38,7 @@ dependencies:
   shared_kernel:
     path: packages/shared_kernel
   stream_transform: ^2.1.0
-  supabase_flutter: ^2.4.0
+  supabase_flutter: ^2.5.2
   user_repository:
     path: packages/user_repository
   work_repository:
