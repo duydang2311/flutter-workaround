@@ -77,10 +77,12 @@ class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
                   (r) => switch (r) {
                     LocationPermission.denied =>
                       _locationClient.requestPermission(),
-                    LocationPermission.deniedForever =>
-                      TaskEither.left(GenericError(
-                        message: 'Location permission has been denied forever.',
-                      )),
+                    LocationPermission.deniedForever => TaskEither.left(
+                        const GenericError(
+                          message:
+                              'Location permission has been denied forever.',
+                        ),
+                      ),
                     LocationPermission.always ||
                     LocationPermission.whileInUse =>
                       TaskEither.right(r),
@@ -132,20 +134,21 @@ class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
                 )
                 .map(Place.fromJson),
             (suggestion) => TaskEither.tryCatch(
-                    () => _client.get(
-                          Uri.https(
-                            'rsapi.goong.io',
-                            '/Place/Detail',
-                            {
-                              'place_id': suggestion.placeId,
-                              'api_key': DartDefine.goongApiKey,
-                            },
-                          ),
-                        ),
-                    (error, _) => switch (error) {
-                          final Exception e => GenericError.fromException(e),
-                          _ => const GenericError.unknown(),
-                        })
+              () => _client.get(
+                Uri.https(
+                  'rsapi.goong.io',
+                  '/Place/Detail',
+                  {
+                    'place_id': suggestion.placeId,
+                    'api_key': DartDefine.goongApiKey,
+                  },
+                ),
+              ),
+              (error, _) => switch (error) {
+                final Exception e => GenericError.fromException(e),
+                _ => const GenericError.unknown(),
+              },
+            )
                 .map(
                   (r) => jsonDecode(utf8.decode(r.bodyBytes))
                       as Map<String, dynamic>,

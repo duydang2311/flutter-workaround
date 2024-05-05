@@ -18,18 +18,20 @@ dependencies:
   flutter_bloc: ^8.1.5
   flutter_localizations:
     sdk: flutter
+  flutter_map: ^6.1.0
+  flutter_map_cancellable_tile_provider: ^2.0.0
+  flutter_map_location_marker: ^8.0.8
+  flutter_map_marker_cluster: ^1.3.5
   formz: ^0.7.0
   fpdart: ^1.1.0
   geocoding: ^3.0.0
   geolocator: ^11.0.0
   go_router: ^14.0.2
   google_fonts: ^6.2.1
-  google_maps_flutter: ^2.6.0
-  google_maps_flutter_android: ^2.8.0
   google_sign_in: ^6.2.1
   http: ^1.2.1
   intl: ^0.18.1
-  label_marker: ^1.0.1
+  latlong2: ^0.9.1
   location_client:
     path: packages/location_client
   profile_repository:
@@ -39,6 +41,7 @@ dependencies:
     path: packages/shared_kernel
   stream_transform: ^2.1.0
   supabase_flutter: ^2.5.2
+  url_launcher: ^6.2.6
   user_repository:
     path: packages/user_repository
   work_repository:
@@ -78,6 +81,9 @@ dart_define:
       required: true
     - name: GOONG_API_KEY
       description: Goong API key
+      required: true
+    - name: MAPTILER_API_KEY
+      description: Maptiler API key
       required: true
   flavors:
     - name: production

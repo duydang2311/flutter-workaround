@@ -11,12 +11,15 @@ final class MapInitialized extends MapEvent {
   const MapInitialized();
 }
 
-final class MapCreated extends MapEvent {
-  const MapCreated({required this.controller});
-
-  final GoogleMapController controller;
-}
-
 final class MapChanged extends MapEvent {
   const MapChanged();
+}
+
+final class MapWorkTapped extends MapEvent {
+  const MapWorkTapped(this.mapWork);
+
+  final MapWork mapWork;
+
+  @override
+  List<Object> get props => [mapWork];
 }

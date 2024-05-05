@@ -25,6 +25,9 @@ class DartDefine {
   /// Goong API key
   static const goongApiKey = String.fromEnvironment('GOONG_API_KEY');
 
+  /// Maptiler API key
+  static const maptilerApiKey = String.fromEnvironment('MAPTILER_API_KEY');
+
 }
 
 /// The flavors supported by the application

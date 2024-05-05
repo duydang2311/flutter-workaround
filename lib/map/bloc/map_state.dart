@@ -2,22 +2,22 @@ part of 'map_bloc.dart';
 
 final class MapState extends Equatable {
   const MapState({
-    this.controller,
-    this.markers = const {},
+    this.mapWorks = const [],
+    this.error = const Option.none(),
   });
 
-  final GoogleMapController? controller;
-  final Set<Marker> markers;
+  final List<MapWork> mapWorks;
+  final Option<UiError> error;
 
   MapState copyWith({
-    GoogleMapController? controller,
-    Set<Marker>? markers,
+    List<MapWork>? mapWorks,
+    Option<UiError>? error,
   }) =>
       MapState(
-        controller: controller ?? this.controller,
-        markers: markers ?? this.markers,
+        mapWorks: mapWorks ?? this.mapWorks,
+        error: error ?? this.error,
       );
 
   @override
-  List<Object?> get props => [controller, markers];
+  List<Object?> get props => [mapWorks, error];
 }

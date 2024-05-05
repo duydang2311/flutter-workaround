@@ -100,7 +100,8 @@ final class _ProfileStats extends StatelessWidget {
                       ),
                       title: const Text('Edit profile'),
                       subtitle: const Text(
-                          'Change profile picture, display name, phone number...'),
+                        'Change profile picture, display name, phone number...',
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         context.push('/profile/edit');

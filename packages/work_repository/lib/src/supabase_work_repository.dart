@@ -4,12 +4,11 @@ import 'dart:developer';
 import 'package:fpdart/fpdart.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:work_repository/src/models/nearby_work.dart';
 import 'package:work_repository/work_repository.dart';
 
 final class SupabaseWorkRepository implements WorkRepository {
   SupabaseWorkRepository({required Supabase supabase}) : _supabase = supabase {
-    _streamController = new StreamController<PostgresChangePayload>.broadcast(
+    _streamController = StreamController<PostgresChangePayload>.broadcast(
       onListen: _handleStreamListen,
       onCancel: _handleStreamCancel,
     );
@@ -92,10 +91,11 @@ final class SupabaseWorkRepository implements WorkRepository {
     _insertRealtimeChannel = _supabase.client
         .channel('works')
         .onPostgresChanges(
-            event: PostgresChangeEvent.all,
-            schema: 'public',
-            table: 'works',
-            callback: _handleStream)
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'works',
+          callback: _handleStream,
+        )
         .subscribe((status, object) {
       log('[SupabaseWorkRepository] _handleStreamListen: $status, $object');
     });
@@ -113,5 +113,31 @@ final class SupabaseWorkRepository implements WorkRepository {
   void _handleStream(PostgresChangePayload payload) {
     _streamController.sink.add(payload);
     log('[SupabaseWorkRepository] _handleStream: $payload');
+  }
+
+  @override
+  TaskEither<GenericError, Work> getWorkById(
+    String id, {
+    String columns = '*',
+  }) {
+    return TaskEither.tryCatch(
+      () => _supabase.client
+          .from('works')
+          .select(columns)
+          .eq('id', id)
+          .limit(1)
+          .maybeSingle(),
+      _catchGenericError,
+    )
+        .flatMap(
+          (r) => TaskEither.fromNullable(
+            r,
+            () => const GenericError(
+              message: 'Work not found',
+              code: 'not_found',
+            ),
+          ),
+        )
+        .map(Work.fromJson);
   }
 }

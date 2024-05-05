@@ -2,38 +2,30 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:label_marker/label_marker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:location_client/location_client.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:work_repository/work_repository.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:workaround/map/models/map_work.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc({
-    required TextStyle textStyle,
-    required Color backgroundColor,
     required WorkRepository workRepository,
     required LocationClient locationClient,
-  })  : _textStyle = textStyle,
-        _backgroundColor = backgroundColor,
-        _workRepository = workRepository,
+  })  : _workRepository = workRepository,
         _locationClient = locationClient,
         super(const MapState()) {
     on<MapInitialized>(_handleMapInitialized);
-    on<MapCreated>(_handleMapCreated);
     on<MapChanged>(_handleMapChanged);
+    on<MapWorkTapped>(_handleWorkTapped);
     _streamSubscription = _workRepository.stream.listen(_handleWorkChanged);
   }
 
-  final TextStyle _textStyle;
-  final Color _backgroundColor;
   final WorkRepository _workRepository;
   final LocationClient _locationClient;
   late final StreamSubscription<PostgresChangePayload> _streamSubscription;
@@ -48,26 +40,50 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     MapInitialized event,
     Emitter<MapState> emit,
   ) async {
-    final markers = await _nearbyMarkersTask.run();
-    emit(state.copyWith(markers: markers));
-  }
-
-  Future<void> _handleMapCreated(
-    MapCreated event,
-    Emitter<MapState> emit,
-  ) async {
-    emit(state.copyWith(controller: event.controller));
+    final mapWorks = await _nearbyMapWorksTask.run();
+    emit(state.copyWith(mapWorks: mapWorks));
   }
 
   Future<void> _handleMapChanged(
     MapChanged event,
     Emitter<MapState> emit,
   ) async {
-    final markers = await _nearbyMarkersTask.run();
-    emit(state.copyWith(markers: markers));
+    final mapWorks = await _nearbyMapWorksTask.run();
+    emit(state.copyWith(mapWorks: mapWorks));
   }
 
-  Task<Set<Marker>> get _nearbyMarkersTask => _locationClient
+  void _handleWorkChanged(PostgresChangePayload payload) {
+    add(const MapChanged());
+  }
+
+  Future<void> _handleWorkTapped(
+    MapWorkTapped event,
+    Emitter<MapState> emit,
+  ) async {
+    await _workRepository
+        .getWorkById(
+      event.mapWork.work.id,
+      columns: 'owner_id, created_at, title, description',
+    )
+        .match((l) {
+      emit(state.copyWith(error: Option.of(UiError.now(message: l.message))));
+    }, (r) {
+      emit(
+        state.copyWith(
+          mapWorks: List.from(
+            state.mapWorks.map(
+              (e) => e.work.id != event.mapWork.work.id
+                  ? e
+                  : e.copyWith(details: Option.of(r)),
+            ),
+          ),
+          error: const Option.none(),
+        ),
+      );
+    }).run();
+  }
+
+  Task<List<MapWork>> get _nearbyMapWorksTask => _locationClient
       .checkPermission()
       .toTaskEither<GenericError>()
       .flatMap<LocationPermission>(
@@ -88,37 +104,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         },
       )
       .flatMap((r) => _locationClient.getCurrentPosition())
-      .flatMap(
-        (r) => _workRepository.getNearbyWorks(r.latitude, r.longitude),
-      )
-      .flatMap(
-        (r) => TaskEither<GenericError, Set<Marker>>(() async {
-          final bitmaps = await r
-              .map(
-                (e) => createCustomMarkerBitmap(
-                  e.title,
-                  textStyle: _textStyle,
-                  backgroundColor: _backgroundColor,
-                ),
-              )
-              .wait;
-          return Either.right(
-            Set.from(
-              r.zip(bitmaps).map<Marker>((e) {
-                final (work, bitmap) = e;
-                return Marker(
-                  markerId: MarkerId(work.id),
-                  icon: bitmap,
-                  position: LatLng(work.lat, work.lng),
-                );
-              }),
-            ),
-          );
-        }),
-      )
-      .getOrElse((l) => <Marker>{});
-
-  void _handleWorkChanged(PostgresChangePayload payload) {
-    add(const MapChanged());
-  }
+      .flatMap((r) => _workRepository.getNearbyWorks(r.latitude, r.longitude))
+      .map((r) => List<MapWork>.from(r.map((e) => MapWork(work: e))))
+      .getOrElse((l) => const []);
 }
