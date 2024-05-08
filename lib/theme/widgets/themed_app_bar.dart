@@ -6,11 +6,13 @@ final class ThemedAppBar extends StatelessWidget
   const ThemedAppBar({
     this.title,
     this.actions,
+    this.bottom,
     super.key,
   });
 
   final Widget? title;
   final List<Widget>? actions;
+  final PreferredSizeWidget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,7 @@ final class ThemedAppBar extends StatelessWidget
               onPressed: context.pop,
             )
           : null,
+      bottom: bottom,
     );
   }
 
