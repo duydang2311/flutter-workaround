@@ -16,7 +16,7 @@ final class SupabaseWorkRepository implements WorkRepository {
 
   final Supabase _supabase;
   late final StreamController<PostgresChangePayload> _streamController;
-  late final RealtimeChannel _insertRealtimeChannel;
+  RealtimeChannel? _insertRealtimeChannel;
 
   @override
   Stream<PostgresChangePayload> get stream => _streamController.stream;
@@ -102,8 +102,9 @@ final class SupabaseWorkRepository implements WorkRepository {
   }
 
   void _handleStreamCancel() {
-    TaskEither.tryCatch(_insertRealtimeChannel.unsubscribe, (error, _) => error)
-        .match((l) {
+    TaskEither.tryCatch(
+        _insertRealtimeChannel!.unsubscribe, (error, _) => error).match((l) {
+      _insertRealtimeChannel = null;
       log('[SupabaseWorkRepository] _handleStreamCancel: $l');
     }, (r) {
       log('[SupabaseWorkRepository] _handleStreamCancel: ok');
