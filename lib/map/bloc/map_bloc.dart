@@ -8,7 +8,7 @@ import 'package:location_client/location_client.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:work_repository/work_repository.dart';
-import 'package:workaround/map/models/map_work.dart';
+import 'package:workaround/map/map.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
@@ -40,6 +40,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     MapInitialized event,
     Emitter<MapState> emit,
   ) async {
+    emit(
+      state.copyWith(
+        positionStream: _locationClient.getPositionStream(
+          const LocationSettings(),
+        ),
+      ),
+    );
     final mapWorks = await _nearbyMapWorksTask.run();
     emit(state.copyWith(mapWorks: mapWorks));
   }
@@ -60,9 +67,22 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     MapWorkTapped event,
     Emitter<MapState> emit,
   ) async {
+    emit(
+      state.copyWith(
+        mapWorks: state.mapWorks
+            .map(
+              (e) => e.id != event.id
+                  ? e
+                  : e.copyWith(
+                      popupStatus: PopupStatus.pending,
+                    ),
+            )
+            .toList(),
+      ),
+    );
     await _workRepository
         .getWorkById(
-      event.mapWork.work.id,
+      event.id,
       columns: 'owner_id, created_at, title, description',
     )
         .match((l) {
@@ -70,13 +90,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }, (r) {
       emit(
         state.copyWith(
-          mapWorks: List.from(
-            state.mapWorks.map(
-              (e) => e.work.id != event.mapWork.work.id
-                  ? e
-                  : e.copyWith(details: Option.of(r)),
-            ),
-          ),
+          tappedId: Option.of(event.id),
+          mapWorks: state.mapWorks
+              .map(
+                (e) => e.id != event.id
+                    ? e
+                    : e.copyWith(
+                        description: Option.fromNullable(r.description),
+                        popupStatus: PopupStatus.none,
+                      ),
+              )
+              .toList(),
           error: const Option.none(),
         ),
       );
@@ -105,6 +129,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       )
       .flatMap((r) => _locationClient.getCurrentPosition())
       .flatMap((r) => _workRepository.getNearbyWorks(r.latitude, r.longitude))
-      .map((r) => List<MapWork>.from(r.map((e) => MapWork(work: e))))
+      .map(
+        (r) => List<MapWork>.from(
+          r.map(
+            (e) => MapWork(
+              id: e.id,
+              title: e.title,
+              lat: e.lat,
+              lng: e.lng,
+              distance: e.distance,
+            ),
+          ),
+        ),
+      )
       .getOrElse((l) => const []);
 }

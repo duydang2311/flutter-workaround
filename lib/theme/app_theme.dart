@@ -19,8 +19,8 @@ abstract class AppTheme {
 
   static ColorScheme darkerOutline(ColorScheme colorScheme) =>
       colorScheme.copyWith(
-        outline: _darken(lightColorScheme.outline, 0.2),
-        outlineVariant: _darken(lightColorScheme.outlineVariant, 0.1),
+        outline: _darken(darkColorScheme.outline, 0.2),
+        outlineVariant: _darken(darkColorScheme.outlineVariant, 0.1),
       );
 
   static ThemeData build(ColorScheme colorScheme) {

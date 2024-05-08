@@ -16,10 +16,10 @@ final class MapChanged extends MapEvent {
 }
 
 final class MapWorkTapped extends MapEvent {
-  const MapWorkTapped(this.mapWork);
+  const MapWorkTapped(this.id);
 
-  final MapWork mapWork;
+  final String id;
 
   @override
-  List<Object> get props => [mapWork];
+  List<Object> get props => [id];
 }

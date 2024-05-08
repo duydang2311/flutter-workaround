@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -6,10 +7,12 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location_client/location_client.dart';
+import 'package:morphable_shape/morphable_shape.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/dart_define.gen.dart';
 import 'package:workaround/map/bloc/map_bloc.dart';
+import 'package:workaround/map/map.dart';
 
 final class MapPage extends StatelessWidget {
   const MapPage({super.key});
@@ -28,205 +31,182 @@ final class MapPage extends StatelessWidget {
   }
 }
 
-// final class _MapView extends StatelessWidget {
-//   const _MapView();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     const initialCameraPosition = CameraPosition(
-//       target: LatLng(10.823099, 106.629662),
-//       zoom: 14.4746,
-//     );
-//     return ColoredBox(
-//       color: Theme.of(context).colorScheme.background,
-//       child: BlocBuilder<MapBloc, MapState>(
-//         builder: (context, state) => GoogleMap(
-//           cloudMapId: 'ebc5db417440cd29',
-//           initialCameraPosition: initialCameraPosition,
-//           zoomControlsEnabled: false,
-//           compassEnabled: false,
-//           mapToolbarEnabled: false,
-//           buildingsEnabled: false,
-//           myLocationButtonEnabled: false,
-//           markers: Set.from(
-//             state.mapWorks.map(
-//               (e) => Marker(
-//                 markerId: MarkerId(e.work.id),
-//                 icon: e.icon,
-//                 position: LatLng(e.work.lat, e.work.lng),
-//                 infoWindow: e.details.match(
-//                   () => InfoWindow.noText,
-//                   (details) => InfoWindow(
-//                     title: details.title,
-//                     snippet: details.description,
-//                   ),
-//                 ),
-//                 onTap: () {
-//                   context.read<MapBloc>().add(MapWorkTapped(e));
-//                 },
-//               ),
-//             ),
-//           ),
-//           onMapCreated: (value) {
-//             context.read<MapBloc>().add(MapCreated(controller: value));
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-final class _MapView extends StatelessWidget {
+final class _MapView extends StatefulWidget {
   const _MapView();
+
+  @override
+  State<StatefulWidget> createState() => _MapViewState();
+}
+
+final class _MapViewState extends State<_MapView> {
+  final PopupController _popupController = PopupController();
+
+  @override
+  void dispose() {
+    _popupController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     final colorScheme = Theme.of(context).colorScheme;
-    final popupController = PopupController();
-    return ColoredBox(
-      color: colorScheme.background,
-      child: BlocBuilder<MapBloc, MapState>(
-        builder: (context, state) => Stack(
+    return PopupScope(
+      popupController: _popupController,
+      child: ColoredBox(
+        color: colorScheme.background,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: const LatLng(10.823099, 106.629662),
+            initialZoom: 14.4746,
+            maxZoom: 20.5,
+            backgroundColor: colorScheme.background,
+            onTap: (_, __) {
+              _popupController.hideAllPopups();
+            },
+          ),
           children: [
-            PopupScope(
-              popupController: popupController,
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: const LatLng(10.823099, 106.629662),
-                  initialZoom: 14.4746,
-                  maxZoom: 20.5,
-                  backgroundColor: colorScheme.background,
-                  onTap: (_, __) {
-                    popupController.hideAllPopups();
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: switch (brightness) {
-                      Brightness.light =>
-                        'https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
-                      Brightness.dark =>
-                        'https://api.maptiler.com/maps/streets-v2-dark/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
-                    },
-                    fallbackUrl:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.verygoodcore.workaround',
-                    tileProvider: CancellableNetworkTileProvider(),
+            TileLayer(
+              urlTemplate: switch (brightness) {
+                Brightness.light =>
+                  'https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
+                Brightness.dark =>
+                  'https://api.maptiler.com/maps/streets-v2-dark/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
+              },
+              fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.verygoodcore.workaround',
+              tileProvider: CancellableNetworkTileProvider(),
+            ),
+            BlocBuilder<MapBloc, MapState>(
+              buildWhen: (previous, current) =>
+                  previous.positionStream != current.positionStream,
+              builder: (context, state) => CurrentLocationLayer(
+                positionStream: state.positionStream.map(
+                  (position) => LocationMarkerPosition(
+                    latitude: position.latitude,
+                    longitude: position.longitude,
+                    accuracy: position.accuracy,
                   ),
-                  MarkerClusterLayerWidget(
-                    options: MarkerClusterLayerOptions(
-                      maxClusterRadius: 80,
-                      spiderfyCircleRadius: 80,
-                      spiderfySpiralDistanceMultiplier: 2,
-                      size: const Size(40, 40),
-                      rotate: true,
-                      maxZoom: 20.5,
-                      polygonOptions: PolygonOptions(
-                        borderColor: colorScheme.primaryContainer,
-                        borderStrokeWidth: 2,
-                      ),
-                      // popupOptions: PopupOptions(
-                      //   popupAnimation: const PopupAnimation.fade(),
-                      //   popupController: popupController,
-                      //   buildPopupOnHover: true,
-                      //   popupBuilder: (context, marker) => Padding(
-                      //     padding: const EdgeInsets.all(10),
-                      //     child: Container(
-                      //       constraints: const BoxConstraints(
-                      //         minWidth: 100,
-                      //         maxWidth: 200,
-                      //       ),
-                      //       child: Column(
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         mainAxisSize: MainAxisSize.min,
-                      //         children: <Widget>[
-                      //           Text(
-                      //             marker.,
-                      //             style: const TextStyle(fontSize: 12.0),
-                      //           ),
-                      //           Text(
-                      //             'Marker size: ${marker.width}, ${marker.height}',
-                      //             style: const TextStyle(fontSize: 12.0),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      markers: List.from(
-                        state.mapWorks.map(
-                          (e) => Marker(
-                            point: LatLng(e.work.lat, e.work.lng),
-                            rotate: true,
-                            width: 140,
-                            height: 30,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(4)),
-                                border: Border.all(
-                                  color: colorScheme.tertiary.withOpacity(0.2),
+                ),
+                headingStream: state.positionStream.map(
+                  (position) => LocationMarkerHeading(
+                    heading: degToRadian(position.heading),
+                    accuracy: degToRadian(position.headingAccuracy),
+                  ),
+                ),
+                moveAnimationDuration: const Duration(milliseconds: 500),
+              ),
+            ),
+            BlocBuilder<MapBloc, MapState>(
+              builder: (context, state) {
+                final markers = state.mapWorks
+                    .map(
+                      (work) => WorkMarker(
+                        key: ValueKey(work.id),
+                        workId: work.id,
+                        point: LatLng(work.lat, work.lng),
+                        rotate: true,
+                        width: 140,
+                        height: 40,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 7),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(4),
+                                  ),
+                                  border: Border.all(
+                                    color: colorScheme.primary.withOpacity(0.2),
+                                  ),
+                                  color: colorScheme.primaryContainer,
                                 ),
+                                child: Center(
+                                  child: Text(
+                                    work.title,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          color: colorScheme.primary,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: ShapeDecoration(
                                 color: colorScheme.primaryContainer,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  e.work.title,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                        color: colorScheme.primary,
-                                      ),
+                                shape: TriangleShapeBorder(
+                                  border: DynamicBorderSide(
+                                    begin: const Length(8),
+                                    color: colorScheme.primary.withOpacity(0.2),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                        growable: false,
                       ),
-                      builder: (context, markers) {
-                        return Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.tertiary.withOpacity(0.1),
-                            ),
-                            color: colorScheme.tertiaryContainer,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '+${markers.length}',
-                              style: TextStyle(
-                                color: colorScheme.tertiary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        );
+                    )
+                    .toList(growable: false);
+                return MarkerClusterLayerWidget(
+                  options: MarkerClusterLayerOptions(
+                    maxClusterRadius: 80,
+                    spiderfyCircleRadius: 80,
+                    spiderfySpiralDistanceMultiplier: 2,
+                    size: const Size(40, 40),
+                    rotate: true,
+                    maxZoom: 20.5,
+                    polygonOptions: PolygonOptions(
+                      borderColor: colorScheme.primaryContainer,
+                      borderStrokeWidth: 2,
+                    ),
+                    popupOptions: PopupOptions(
+                      popupAnimation: const PopupAnimation.fade(),
+                      popupController: _popupController,
+                      popupBuilder: (context, marker) {
+                        if (marker is! WorkMarker) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final work = state.mapWorks
+                            .firstWhereOrNull((e) => e.id == marker.workId);
+                        if (work == null) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return WorkPopup(key: ValueKey(work.id), work: work);
                       },
                     ),
+                    markers: markers,
+                    onMarkerTap: (marker) {
+                      if (marker is! WorkMarker) return;
+                      context.read<MapBloc>().add(MapWorkTapped(marker.workId));
+                    },
+                    builder: (context, markers) {
+                      return WorkCluster(size: markers.length);
+                    },
                   ),
-                  CurrentLocationLayer(),
-                  RichAttributionWidget(
-                    popupInitialDisplayDuration: const Duration(seconds: 5),
-                    animationConfig: const ScaleRAWA(),
-                    showFlutterMapAttribution: false,
-                    attributions: [
-                      TextSourceAttribution(
-                        'OpenStreetMap contributors',
-                        onTap: () => launchUrl(
-                          Uri.parse('https://openstreetmap.org/copyright'),
-                        ),
-                      ),
-                    ],
+                );
+              },
+            ),
+            RichAttributionWidget(
+              popupInitialDisplayDuration: const Duration(seconds: 5),
+              animationConfig: const ScaleRAWA(),
+              attributions: [
+                TextSourceAttribution(
+                  'OpenStreetMap contributors',
+                  onTap: () => launchUrl(
+                    Uri.parse('https://openstreetmap.org/copyright'),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),

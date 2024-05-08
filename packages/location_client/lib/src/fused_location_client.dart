@@ -6,6 +6,9 @@ import 'package:location_client/location_client.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 
 final class FusedLocationClient implements LocationClient {
+  Stream<Position> getPositionStream(LocationSettings? locationSettings) =>
+      Geolocator.getPositionStream();
+
   @override
   Task<bool> isLocationServiceEnabled() {
     return const Task(
