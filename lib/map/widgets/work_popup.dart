@@ -9,6 +9,8 @@ final class WorkPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: MediaQuery.sizeOf(context).width * 0.6,
       child: Card.outlined(
@@ -29,9 +31,14 @@ final class WorkPopup extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints.loose(const Size.fromHeight(200)),
                   child: SingleChildScrollView(
-                    child: Text(
-                      work.description.toNullable() ??
-                          'This work provides no description.',
+                    child: work.description.match(
+                      () => Text(
+                        'The author has not provided job description.',
+                        style: TextStyle(
+                          color: colorScheme.onSurface.withOpacity(0.4),
+                        ),
+                      ),
+                      Text.new,
                     ),
                   ),
                 ),
