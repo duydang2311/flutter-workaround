@@ -13,6 +13,7 @@ final class ThemedAppBarTitle extends StatelessWidget {
       style: theme.textTheme.titleLarge!.copyWith(
         fontWeight: FontWeight.w700,
       ),
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

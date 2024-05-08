@@ -42,21 +42,28 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) async {
     emit(
       state.copyWith(
+        status: MapStatus.pending,
         positionStream: _locationClient.getPositionStream(
           const LocationSettings(),
         ),
       ),
     );
     final mapWorks = await _nearbyMapWorksTask.run();
-    emit(state.copyWith(mapWorks: mapWorks));
+    emit(
+      state.copyWith(
+        mapWorks: mapWorks,
+        status: MapStatus.none,
+      ),
+    );
   }
 
   Future<void> _handleMapChanged(
     MapChanged event,
     Emitter<MapState> emit,
   ) async {
+    emit(state.copyWith(status: MapStatus.pending));
     final mapWorks = await _nearbyMapWorksTask.run();
-    emit(state.copyWith(mapWorks: mapWorks));
+    emit(state.copyWith(mapWorks: mapWorks, status: MapStatus.none));
   }
 
   void _handleWorkChanged(PostgresChangePayload payload) {
@@ -90,7 +97,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }, (r) {
       emit(
         state.copyWith(
-          tappedId: Option.of(event.id),
           mapWorks: state.mapWorks
               .map(
                 (e) => e.id != event.id

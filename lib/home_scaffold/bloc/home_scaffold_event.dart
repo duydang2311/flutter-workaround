@@ -21,3 +21,14 @@ final class HomeScaffoldChanged extends HomeScaffoldEvent {
 final class HomeScaffoldCreateWorkRequested extends HomeScaffoldEvent {
   const HomeScaffoldCreateWorkRequested();
 }
+
+final class HomeScaffoldStatusChanged extends HomeScaffoldEvent {
+  const HomeScaffoldStatusChanged({
+    required this.status,
+  });
+
+  final HomeScaffoldStatus status;
+
+  @override
+  List<Object?> get props => [status];
+}
