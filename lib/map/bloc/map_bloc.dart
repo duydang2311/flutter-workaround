@@ -51,7 +51,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final mapWorks = await _nearbyMapWorksTask.run();
     emit(
       state.copyWith(
-        mapWorks: mapWorks,
+        mapWorks: {for (final e in mapWorks) e.id: e},
         status: MapStatus.none,
       ),
     );
@@ -63,7 +63,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) async {
     emit(state.copyWith(status: MapStatus.pending));
     final mapWorks = await _nearbyMapWorksTask.run();
-    emit(state.copyWith(mapWorks: mapWorks, status: MapStatus.none));
+    emit(
+      state.copyWith(
+        mapWorks: {for (final e in mapWorks) e.id: e},
+        status: MapStatus.none,
+      ),
+    );
   }
 
   void _handleWorkChanged(PostgresChangePayload payload) {
@@ -74,17 +79,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     MapWorkTapped event,
     Emitter<MapState> emit,
   ) async {
+    final work = state.mapWorks[event.id];
+    if (work == null) return;
     emit(
       state.copyWith(
-        mapWorks: state.mapWorks
-            .map(
-              (e) => e.id != event.id
-                  ? e
-                  : e.copyWith(
-                      popupStatus: PopupStatus.pending,
-                    ),
-            )
-            .toList(),
+        mapWorks: {
+          ...state.mapWorks,
+          event.id: work.copyWith(
+            popupStatus: PopupStatus.pending,
+          ),
+        },
       ),
     );
     await _workRepository
@@ -95,18 +99,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         .match((l) {
       emit(state.copyWith(error: Option.of(UiError.now(message: l.message))));
     }, (r) {
+      final work = state.mapWorks[event.id];
       emit(
         state.copyWith(
-          mapWorks: state.mapWorks
-              .map(
-                (e) => e.id != event.id
-                    ? e
-                    : e.copyWith(
-                        description: Option.fromNullable(r.description),
-                        popupStatus: PopupStatus.none,
-                      ),
+          mapWorks: {
+            ...state.mapWorks,
+            if (work != null)
+              event.id: work.copyWith(
+                description: Option.fromNullable(r.description),
+                popupStatus: PopupStatus.none,
               )
-              .toList(),
+          },
           error: const Option.none(),
         ),
       );

@@ -2,19 +2,19 @@ part of 'map_bloc.dart';
 
 final class MapState extends Equatable {
   const MapState({
-    this.mapWorks = const [],
+    this.mapWorks = const {},
     this.error = const Option.none(),
     this.positionStream = const Stream.empty(),
     this.status = MapStatus.none,
   });
 
-  final List<MapWork> mapWorks;
+  final Map<String, MapWork> mapWorks;
   final Option<UiError> error;
   final Stream<Position> positionStream;
   final MapStatus status;
 
   MapState copyWith({
-    List<MapWork>? mapWorks,
+    Map<String, MapWork>? mapWorks,
     Option<UiError>? error,
     Stream<Position>? positionStream,
     MapStatus? status,

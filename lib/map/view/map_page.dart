@@ -148,7 +148,7 @@ final class _MapViewState extends State<_MapView> {
                 buildWhen: (previous, current) =>
                     previous.mapWorks != current.mapWorks,
                 builder: (context, state) {
-                  final markers = state.mapWorks
+                  final markers = state.mapWorks.values
                       .map(
                         (work) => WorkMarker(
                           key: ValueKey(work.id),
@@ -226,13 +226,11 @@ final class _MapViewState extends State<_MapView> {
                             return const SizedBox.shrink();
                           }
 
-                          final work = state.mapWorks
-                              .firstWhereOrNull((e) => e.id == marker.workId);
+                          final work = state.mapWorks[marker.workId];
                           if (work == null) {
                             return const SizedBox.shrink();
                           }
 
-                          log('popup ${work.title}');
                           return WorkPopup(
                             key: ValueKey(work.id),
                             work: work,
