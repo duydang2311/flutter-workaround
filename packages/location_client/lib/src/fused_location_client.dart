@@ -6,8 +6,21 @@ import 'package:location_client/location_client.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 
 final class FusedLocationClient implements LocationClient {
-  Stream<Position> getPositionStream(LocationSettings? locationSettings) =>
-      Geolocator.getPositionStream();
+  @override
+  Either<GenericError, Stream<Position>> getPositionStream({
+    LocationSettings? settings,
+  }) =>
+      Either.tryCatch(
+        () => Geolocator.getPositionStream(locationSettings: settings),
+        (error, _) => switch (error) {
+          final TimeoutException e =>
+            GenericError.fromException(e, code: 'timeout'),
+          final LocationServiceDisabledException e =>
+            GenericError.fromException(e, code: 'disabled'),
+          final Exception e => GenericError.fromException(e),
+          _ => const GenericError.unknown(),
+        },
+      );
 
   @override
   Task<bool> isLocationServiceEnabled() {

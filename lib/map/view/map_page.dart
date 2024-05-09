@@ -1,13 +1,10 @@
-import 'dart:developer';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location_client/location_client.dart';
 import 'package:morphable_shape/morphable_shape.dart';
@@ -24,40 +21,11 @@ final class MapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<HomeScaffoldBloc>();
-    bloc.add(
-      HomeScaffoldChanged(
-        scaffoldMap: {
-          ...bloc.state.scaffoldMap,
-          'map': ScaffoldData(
-            appBar: ThemedAppBar(
-              title: const ThemedAppBarTitle(
-                'Binh Thanh, Ho Chi Minh City',
-              ),
-              bottom: PreferredSize(
-                preferredSize: Size(
-                  double.infinity,
-                  ProgressIndicatorTheme.of(context).linearMinHeight!,
-                ),
-                child: BlocBuilder<HomeScaffoldBloc, HomeScaffoldState>(
-                  buildWhen: (previous, current) =>
-                      previous.status != current.status,
-                  builder: (context, state) => switch (state.status) {
-                    HomeScaffoldStatus.pending =>
-                      const LinearProgressIndicator(),
-                    _ => const SizedBox.shrink(),
-                  },
-                ),
-              ),
-            ),
-          ),
-        },
-      ),
-    );
     return BlocProvider(
       create: (_) => MapBloc(
         workRepository: RepositoryProvider.of<WorkRepository>(context),
         locationClient: RepositoryProvider.of<LocationClient>(context),
+        client: RepositoryProvider.of<Client>(context),
       )..add(const MapInitialized()),
       child: const SafeArea(
         child: _MapView(),
@@ -86,18 +54,54 @@ final class _MapViewState extends State<_MapView> {
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     final colorScheme = Theme.of(context).colorScheme;
-    return BlocListener<MapBloc, MapState>(
-      listenWhen: (previous, current) => previous.status != current.status,
-      listener: (context, state) {
-        context.read<HomeScaffoldBloc>().add(
-              HomeScaffoldStatusChanged(
-                status: switch (state.status) {
-                  MapStatus.pending => HomeScaffoldStatus.pending,
-                  _ => HomeScaffoldStatus.none,
-                },
+    final bloc = context.read<HomeScaffoldBloc>();
+    bloc.add(
+      HomeScaffoldChanged(
+        scaffoldMap: {
+          ...bloc.state.scaffoldMap,
+          'map': ScaffoldData(
+            appBar: ThemedAppBar(
+              title: BlocBuilder<MapBloc, MapState>(
+                buildWhen: (previous, current) =>
+                    previous.address != current.address,
+                builder: (context, state) => ThemedAppBarTitle(state.address),
               ),
-            );
-      },
+              bottom: PreferredSize(
+                preferredSize: Size(
+                  double.infinity,
+                  ProgressIndicatorTheme.of(context).linearMinHeight!,
+                ),
+                child: BlocBuilder<MapBloc, MapState>(
+                  buildWhen: (previous, current) =>
+                      previous.status != current.status,
+                  builder: (context, state) => switch (state.status) {
+                    MapStatus.pending => const LinearProgressIndicator(),
+                    _ => const SizedBox.shrink(),
+                  },
+                ),
+              ),
+            ),
+          ),
+        },
+      ),
+    );
+
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<MapBloc, MapState>(
+          listenWhen: (previous, current) => previous.status != current.status,
+          listener: (context, state) {
+            context.read<HomeScaffoldBloc>().add(
+                  HomeScaffoldStatusChanged(
+                    status: switch (state.status) {
+                      MapStatus.pending => HomeScaffoldStatus.pending,
+                      _ => HomeScaffoldStatus.none,
+                    },
+                  ),
+                );
+          },
+        ),
+      ],
       child: PopupScope(
         popupController: _popupController,
         child: ColoredBox(
