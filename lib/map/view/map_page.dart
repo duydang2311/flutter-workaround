@@ -62,6 +62,7 @@ final class _MapViewState extends State<_MapView> {
           'map': ScaffoldData(
             appBar: ThemedAppBar(
               title: BlocBuilder<MapBloc, MapState>(
+                bloc: context.read<MapBloc>(),
                 buildWhen: (previous, current) =>
                     previous.address != current.address,
                 builder: (context, state) => ThemedAppBarTitle(state.address),
@@ -72,6 +73,7 @@ final class _MapViewState extends State<_MapView> {
                   ProgressIndicatorTheme.of(context).linearMinHeight!,
                 ),
                 child: BlocBuilder<MapBloc, MapState>(
+                  bloc: context.read<MapBloc>(),
                   buildWhen: (previous, current) =>
                       previous.status != current.status,
                   builder: (context, state) => switch (state.status) {
