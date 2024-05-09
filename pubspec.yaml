@@ -35,8 +35,6 @@ dependencies:
   google_sign_in: ^6.2.1
   http: ^1.2.1
   image_picker: ^1.1.0
-  infrastructure:
-    path: packages/infrastructure
   intl: ^0.18.1
   jiffy: ^6.2.1
   latlong2: ^0.9.1

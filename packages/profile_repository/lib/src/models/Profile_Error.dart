@@ -1,4 +1,5 @@
-import 'package:infrastructure/infrastructure.dart';
+
+import 'package:shared_kernel/shared_kernel.dart';
 
 final class ProfileError extends SupabaseError {
   const ProfileError({

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:go_router/go_router.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:workaround/edit_profile/bloc/edit_profile_bloc.dart';
 import 'package:workaround/edit_profile/models/models.dart';
+import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/theme/theme.dart';
 
@@ -24,20 +24,14 @@ final class EditProfilePage extends StatelessWidget {
             ),
           ),
         },
+      )
+    );
     return BlocProvider(
       create: (context) =>
           EditProfileBloc(profileRepository: RepositoryProvider.of(context)),
-      child: const Scaffold(
-        appBar: ThemedAppBar(
-          title: ThemedAppBarTitle('Edit profile'),
-        ),
-        body: ThemedScaffoldBody(
+      child: const ThemedScaffoldBody(
           child: _EditProfileView(),
         ),
-      ),
-    );
-    return const ThemedScaffoldBody(
-      child: _EditProfileView(),
     );
   }
 }
