@@ -1,0 +1,1 @@
+export './view/img_picker_view.dart';

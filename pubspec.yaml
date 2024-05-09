@@ -14,6 +14,7 @@ dependencies:
   collection: ^1.18.0
   cronet_http: ^1.2.0
   dartfield: ^1.1.0
+  dotted_border: ^2.1.0
   dynamic_color: ^1.7.0
   equatable: ^2.0.5
   flutter:
@@ -33,6 +34,9 @@ dependencies:
   google_fonts: ^6.2.1
   google_sign_in: ^6.2.1
   http: ^1.2.1
+  image_picker: ^1.1.0
+  infrastructure:
+    path: packages/infrastructure
   intl: ^0.18.1
   jiffy: ^6.2.1
   latlong2: ^0.9.1
