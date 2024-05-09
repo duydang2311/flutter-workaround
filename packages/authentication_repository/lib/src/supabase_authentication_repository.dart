@@ -115,6 +115,7 @@ final class SupabaseAuthenticationRepository
   }
 
   AuthenticationError _catch(Object error, StackTrace stackTrace) {
+    print(error);
     if (error is AuthException) {
       return AuthenticationError.fromException(error);
     }

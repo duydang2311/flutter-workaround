@@ -1,4 +1,4 @@
-set windows-shell := ["pwsh.exe", "-c"]
+set windows-shell := ["cmd.exe", "/c"]
 set dotenv-load
 
 [windows]

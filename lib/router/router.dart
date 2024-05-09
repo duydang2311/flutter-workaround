@@ -6,6 +6,13 @@ import 'package:workaround/edit_profile/edit_profile.dart';
 import 'package:workaround/home/view/home_page.dart';
 import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:workaround/map/view/map_page.dart';
+import 'package:workaround/edit_dob_input/edit_dob_input.dart';
+import 'package:workaround/edit_gender_input/view/edit_gender_input_page.dart';
+import 'package:workaround/edit_name_input/view/edit_name_input_page.dart';
+import 'package:workaround/edit_profile/view/edit_profile_page.dart';
+import 'package:workaround/home/view/home_page.dart';
+import 'package:workaround/home_navigation/widgets/home_scaffold.dart';
+import 'package:workaround/img_picker/img_pick.dart';
 import 'package:workaround/profile/view/profile_page.dart';
 import 'package:workaround/sign_in/sign_in.dart';
 import 'package:workaround/sign_up/sign_up.dart';
@@ -70,6 +77,36 @@ final router = GoRouter(
                     key: ValueKey('edit_profile'),
                     child: EditProfilePage(),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'edit-display-name',
+                      pageBuilder: (context, state) => const MaterialPage(
+                        key: ValueKey('edit_display_name'),
+                        child: EditNameInputPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'edit-dob',
+                      pageBuilder: (context, state) => const MaterialPage(
+                        key: ValueKey('edit_dob'),
+                        child: EditDobInputPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'edit-gender',
+                      pageBuilder: (context, state) => const MaterialPage(
+                        key: ValueKey('edit_gender'),
+                        child: EditGenderInputPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'edit-avatar',
+                      pageBuilder: (context, state) => const MaterialPage(
+                        key: ValueKey('edit_avatar'),
+                        child: ImagePickerPage(),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -1,0 +1,1 @@
+export './view/edit_gender_input_page.dart';

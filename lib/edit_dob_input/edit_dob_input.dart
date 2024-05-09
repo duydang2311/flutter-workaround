@@ -1,0 +1,1 @@
+export './view/edit_dob_input_page.dart';
