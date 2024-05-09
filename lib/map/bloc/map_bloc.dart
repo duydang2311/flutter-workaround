@@ -52,15 +52,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     Emitter<MapState> emit,
   ) async {
     _streamSubscription = _workRepository.stream.listen(_handleWorkChanged);
-    _getPositionStreamWithRetry(
-      settings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 5,
-        timeLimit: Duration(seconds: 5),
-      ),
-    ).match((l) {}, (r) {
-      _positionStreamSubscription = r.listen(_handleCurrentPosition);
-    });
+    unawaited(
+      _getPositionStreamWithRetry(
+        settings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 5,
+        ),
+      ).match((l) {}, (r) {
+        _positionStreamSubscription = r.listen(_handleCurrentPosition);
+      }).run(),
+    );
 
     emit(state.copyWith(status: MapStatus.pending));
     final positionStream = await _getPositionStreamWithRetry().match(
