@@ -19,6 +19,11 @@ base class GenericError extends Equatable {
   final String code;
   final String message;
 
+  String get formatted => switch (code) {
+        final _ when code.isEmpty => "$message (code: '-')",
+        _ => "$message (code: '$code')",
+      };
+
   @override
   List<Object> get props => [code, message];
 }
