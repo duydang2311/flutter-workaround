@@ -52,9 +52,9 @@ final class _MapViewState extends State<_MapView> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
     final colorScheme = Theme.of(context).colorScheme;
     final bloc = context.read<HomeScaffoldBloc>();
+    final mapBloc = context.read<MapBloc>();
     bloc.add(
       HomeScaffoldChanged(
         scaffoldMap: {
@@ -62,7 +62,7 @@ final class _MapViewState extends State<_MapView> {
           'map': ScaffoldData(
             appBar: ThemedAppBar(
               title: BlocBuilder<MapBloc, MapState>(
-                bloc: context.read<MapBloc>(),
+                bloc: mapBloc,
                 buildWhen: (previous, current) =>
                     previous.address != current.address,
                 builder: (context, state) => ThemedAppBarTitle(state.address),
@@ -73,7 +73,7 @@ final class _MapViewState extends State<_MapView> {
                   ProgressIndicatorTheme.of(context).linearMinHeight!,
                 ),
                 child: BlocBuilder<MapBloc, MapState>(
-                  bloc: context.read<MapBloc>(),
+                  bloc: mapBloc,
                   buildWhen: (previous, current) =>
                       previous.status != current.status,
                   builder: (context, state) => switch (state.status) {
@@ -128,160 +128,194 @@ final class _MapViewState extends State<_MapView> {
               },
             ),
             children: [
-              TileLayer(
-                urlTemplate: switch (brightness) {
-                  Brightness.light =>
-                    'https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
-                  Brightness.dark =>
-                    'https://api.maptiler.com/maps/streets-v2-dark/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
-                },
-                fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.verygoodcore.workaround',
-                tileProvider: CancellableNetworkTileProvider(),
-              ),
-              BlocBuilder<MapBloc, MapState>(
-                buildWhen: (previous, current) =>
-                    previous.positionStream != current.positionStream,
-                builder: (context, state) => CurrentLocationLayer(
-                  positionStream: state.positionStream.map(
-                    (position) => LocationMarkerPosition(
-                      latitude: position.latitude,
-                      longitude: position.longitude,
-                      accuracy: position.accuracy,
-                    ),
-                  ),
-                  headingStream: state.positionStream.map(
-                    (position) => LocationMarkerHeading(
-                      heading: degToRadian(position.heading),
-                      accuracy: degToRadian(position.headingAccuracy),
-                    ),
-                  ),
-                  moveAnimationDuration: const Duration(milliseconds: 500),
-                ),
-              ),
-              BlocBuilder<MapBloc, MapState>(
-                buildWhen: (previous, current) =>
-                    previous.mapWorks != current.mapWorks,
-                builder: (context, state) {
-                  final markers = state.mapWorks.values
-                      .map(
-                        (work) => WorkMarker(
-                          key: ValueKey(work.id),
-                          workId: work.id,
-                          point: LatLng(work.lat, work.lng),
-                          rotate: true,
-                          width: 140,
-                          height: 40,
-                          child: Stack(
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 7),
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(4),
-                                    ),
-                                    border: Border.all(
-                                      color:
-                                          colorScheme.primary.withOpacity(0.2),
-                                    ),
-                                    color: colorScheme.primaryContainer,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      work.title,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(
-                                            color: colorScheme.primary,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: ShapeDecoration(
-                                  color: colorScheme.primaryContainer,
-                                  shape: TriangleShapeBorder(
-                                    border: DynamicBorderSide(
-                                      begin: const Length(8),
-                                      color:
-                                          colorScheme.primary.withOpacity(0.2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(growable: false);
-                  return MarkerClusterLayerWidget(
-                    options: MarkerClusterLayerOptions(
-                      maxClusterRadius: 80,
-                      spiderfyCircleRadius: 80,
-                      spiderfySpiralDistanceMultiplier: 2,
-                      size: const Size(40, 40),
-                      rotate: true,
-                      maxZoom: 20.5,
-                      polygonOptions: PolygonOptions(
-                        borderColor: colorScheme.primaryContainer,
-                        borderStrokeWidth: 2,
-                      ),
-                      popupOptions: PopupOptions(
-                        popupAnimation: const PopupAnimation.fade(),
-                        popupController: _popupController,
-                        popupBuilder: (context, marker) {
-                          if (marker is! WorkMarker) {
-                            return const SizedBox.shrink();
-                          }
-
-                          final work = state.mapWorks[marker.workId];
-                          if (work == null) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return WorkPopup(
-                            key: ValueKey(work.id),
-                            work: work,
-                          );
-                        },
-                      ),
-                      markers: markers,
-                      onMarkerTap: (marker) {
-                        if (marker is! WorkMarker) return;
-                        context
-                            .read<MapBloc>()
-                            .add(MapWorkTapped(marker.workId));
-                      },
-                      builder: (context, markers) {
-                        return WorkCluster(size: markers.length);
-                      },
-                    ),
-                  );
-                },
-              ),
-              RichAttributionWidget(
-                popupInitialDisplayDuration: const Duration(seconds: 5),
-                animationConfig: const ScaleRAWA(),
-                attributions: [
-                  TextSourceAttribution(
-                    'OpenStreetMap contributors',
-                    onTap: () => launchUrl(
-                      Uri.parse('https://openstreetmap.org/copyright'),
-                    ),
-                  ),
-                ],
-              ),
+              const _TileLayer(),
+              const _CurrentLocationLayer(),
+              _MarkerClusterLayer(popupController: _popupController),
+              const _AttributionLayer(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+final class _TileLayer extends StatelessWidget {
+  const _TileLayer();
+
+  @override
+  Widget build(BuildContext context) {
+    return TileLayer(
+      urlTemplate: switch (Theme.of(context).brightness) {
+        Brightness.light =>
+          'https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
+        Brightness.dark =>
+          'https://api.maptiler.com/maps/streets-v2-dark/256/{z}/{x}/{y}@2x.png?key=${DartDefine.maptilerApiKey}',
+      },
+      fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      userAgentPackageName: 'com.example.verygoodcore.workaround',
+      tileProvider: CancellableNetworkTileProvider(),
+    );
+  }
+}
+
+final class _CurrentLocationLayer extends StatelessWidget {
+  const _CurrentLocationLayer();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MapBloc, MapState>(
+      buildWhen: (previous, current) =>
+          previous.positionStream != current.positionStream,
+      builder: (context, state) => CurrentLocationLayer(
+        positionStream: state.positionStream.map(
+          (position) => LocationMarkerPosition(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            accuracy: position.accuracy,
+          ),
+        ),
+        headingStream: state.positionStream.map(
+          (position) => LocationMarkerHeading(
+            heading: degToRadian(position.heading),
+            accuracy: degToRadian(position.headingAccuracy),
+          ),
+        ),
+        moveAnimationDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+}
+
+final class _MarkerClusterLayer extends StatelessWidget {
+  const _MarkerClusterLayer({required this.popupController});
+
+  final PopupController popupController;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return BlocBuilder<MapBloc, MapState>(
+      buildWhen: (previous, current) => previous.mapWorks != current.mapWorks,
+      builder: (context, state) {
+        final markers = state.mapWorks.values
+            .map(
+              (work) => WorkMarker(
+                key: ValueKey(work.id),
+                workId: work.id,
+                point: LatLng(work.lat, work.lng),
+                rotate: true,
+                width: 140,
+                height: 40,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 7),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(4),
+                          ),
+                          border: Border.all(
+                            color: colorScheme.primary.withOpacity(0.2),
+                          ),
+                          color: colorScheme.primaryContainer,
+                        ),
+                        child: Center(
+                          child: Text(
+                            work.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: ShapeDecoration(
+                        color: colorScheme.primaryContainer,
+                        shape: TriangleShapeBorder(
+                          border: DynamicBorderSide(
+                            begin: const Length(8),
+                            color: colorScheme.primary.withOpacity(0.2),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(growable: false);
+        return MarkerClusterLayerWidget(
+          options: MarkerClusterLayerOptions(
+            maxClusterRadius: 80,
+            spiderfyCircleRadius: 80,
+            spiderfySpiralDistanceMultiplier: 2,
+            size: const Size(40, 40),
+            rotate: true,
+            maxZoom: 20.5,
+            polygonOptions: PolygonOptions(
+              borderColor: colorScheme.primaryContainer,
+              borderStrokeWidth: 2,
+            ),
+            popupOptions: PopupOptions(
+              popupAnimation: const PopupAnimation.fade(),
+              popupController: popupController,
+              popupBuilder: (context, marker) {
+                if (marker is! WorkMarker) {
+                  return const SizedBox.shrink();
+                }
+
+                final work = state.mapWorks[marker.workId];
+                if (work == null) {
+                  return const SizedBox.shrink();
+                }
+
+                return WorkPopup(
+                  key: ValueKey(work.id),
+                  work: work,
+                );
+              },
+            ),
+            markers: markers,
+            onMarkerTap: (marker) {
+              if (marker is! WorkMarker) return;
+              context.read<MapBloc>().add(MapWorkTapped(marker.workId));
+            },
+            builder: (context, markers) {
+              return WorkCluster(size: markers.length);
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+final class _AttributionLayer extends StatelessWidget {
+  const _AttributionLayer();
+
+  @override
+  Widget build(BuildContext context) {
+    return RichAttributionWidget(
+      popupInitialDisplayDuration: const Duration(seconds: 5),
+      animationConfig: const ScaleRAWA(),
+      attributions: [
+        TextSourceAttribution(
+          'OpenStreetMap contributors',
+          onTap: () => launchUrl(
+            Uri.parse('https://openstreetmap.org/copyright'),
+          ),
+        ),
+      ],
     );
   }
 }
