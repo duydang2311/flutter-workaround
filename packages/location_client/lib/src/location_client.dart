@@ -12,5 +12,7 @@ abstract interface class LocationClient {
     bool forceAndroidLocationManager = false,
     Duration? timeLimit,
   });
-  Stream<Position> getPositionStream(LocationSettings? locationSettings);
+  Stream<Position> getPositionStream({
+    LocationSettings? settings,
+  });
 }

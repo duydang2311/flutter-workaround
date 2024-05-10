@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:workaround/map/models/popup_status.dart';
 
