@@ -1,5 +1,6 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -107,6 +108,8 @@ final class _AppViewState extends State<AppView> {
         }
 
         return MaterialApp.router(
+          // scrollBehavior: const MaterialScrollBehavior()
+          //     .copyWith(dragDevices: PointerDeviceKind.values.toSet()),
           theme: AppTheme.build(AppTheme.lighterOutline(lightColorScheme))
               .copyWith(extensions: [lightCustomColors]),
           darkTheme: AppTheme.build(AppTheme.darkerOutline(darkColorScheme))

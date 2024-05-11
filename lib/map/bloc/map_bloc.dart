@@ -216,7 +216,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     add(const _MapStatusChanged(status: MapStatus.pending));
     final (works, address) = await (
       _workRepository
-          .getNearbyWorks(position.latitude, position.longitude)
+          .getNearbyWorks(
+            position.latitude,
+            position.longitude,
+            kmRadius: 10,
+          )
           .map(
             (r) => List<MapWork>.from(
               r.map(
@@ -295,7 +299,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         },
       )
       .flatMap((r) => _locationClient.getCurrentPosition())
-      .flatMap((r) => _workRepository.getNearbyWorks(r.latitude, r.longitude))
+      .flatMap(
+        (r) => _workRepository.getNearbyWorks(
+          r.latitude,
+          r.longitude,
+          kmRadius: 10,
+        ),
+      )
       .map(
         (r) => List<MapWork>.from(
           r.map(

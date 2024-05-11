@@ -13,6 +13,7 @@ final class ThemedScaffoldBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget widget = SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: child,

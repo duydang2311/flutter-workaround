@@ -30,6 +30,7 @@ final class SupabaseWorkRepository implements WorkRepository {
         'description': work.description,
         'place_id': work.placeId,
         'location': 'point(${work.lng} ${work.lat})',
+        'address': work.address,
       }),
       _catch,
     );
@@ -46,9 +47,9 @@ final class SupabaseWorkRepository implements WorkRepository {
       () => _supabase.client.rpc<dynamic>(
         'works_get_nearby',
         params: {
-          'lat': lat,
-          'lng': lng,
-          'radius': (kmRadius ?? 10) * 1000,
+          'from_lat': lat,
+          'from_lng': lng,
+          if (kmRadius != null) 'radius': kmRadius * 1000,
           'max_rows': limit ?? 10,
         },
       ),
@@ -58,7 +59,10 @@ final class SupabaseWorkRepository implements WorkRepository {
         final json = e as Map<String, dynamic>;
         return NearbyWork(
           id: json['id'] as String,
+          createdAt: DateTime.parse(json['created_at'] as String),
+          ownerName: json['owner_name'] as String,
           title: json['title'] as String,
+          address: json['address'] as String,
           lat: json['lat'] as double,
           lng: json['lng'] as double,
           distance: json['distance'] as double,
@@ -140,5 +144,74 @@ final class SupabaseWorkRepository implements WorkRepository {
           ),
         )
         .map(Work.fromJson);
+  }
+
+  @override
+  TaskEither<GenericError, List<Map<String, dynamic>>> getWorks({
+    String? from,
+    String columns = '*',
+    RowRange? range,
+    ColumnOrder? order,
+    int? limit,
+  }) {
+    PostgrestTransformBuilder<List<Map<String, dynamic>>> builder =
+        _supabase.client.from(from ?? 'works').select(columns);
+    if (order != null) {
+      builder = builder.order(
+        order.column,
+        ascending: order.ascending,
+        nullsFirst: order.nullsFirst,
+        referencedTable: order.referencedTable,
+      );
+    }
+    if (limit != null) {
+      builder = builder.limit(limit);
+    }
+    if (range != null) {
+      builder = builder.range(
+        range.from,
+        range.to,
+        referencedTable: range.referencedTable,
+      );
+    }
+    return TaskEither.tryCatch(
+      () => builder,
+      _catchGenericError,
+    );
+    // .map((r) => r.map(Work.fromJson).toList());
+  }
+
+  @override
+  TaskEither<GenericError, List<NearbyWorkWithDescription>>
+      getNearbyWorksWithDescription(double lat, double lng,
+          {double? kmRadius, int? limit, int descriptionLength = 80}) {
+    return TaskEither.tryCatch(
+      () => _supabase.client.rpc<dynamic>(
+        'works_get_nearby_with_desc',
+        params: {
+          'from_lat': lat,
+          'from_lng': lng,
+          if (kmRadius != null) 'radius': kmRadius * 1000,
+          'max_rows': limit ?? 10,
+          'description_length': descriptionLength,
+        },
+      ),
+      _catchGenericError,
+    ).map(
+      (r) => (r as List).map((e) {
+        final json = e as Map<String, dynamic>;
+        return NearbyWorkWithDescription(
+          id: json['id'] as String,
+          createdAt: DateTime.parse(json['created_at'] as String),
+          ownerName: json['owner_name'] as String,
+          title: json['title'] as String,
+          address: json['address'] as String,
+          lat: json['lat'] as double,
+          lng: json['lng'] as double,
+          distance: json['distance'] as double,
+          description: json['description'] as String,
+        );
+      }).toList(),
+    );
   }
 }

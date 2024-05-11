@@ -10,19 +10,10 @@ final class Work extends Equatable {
     this.lat = 0,
     this.lng = 0,
     this.title = '',
+    this.address = '',
     this.description,
   })  : createdAt = createdAt ?? DateTime.now().toUtc(),
         updatedAt = updatedAt ?? DateTime.now().toUtc();
-
-  final String id;
-  final String ownerId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String placeId;
-  final double lat;
-  final double lng;
-  final String title;
-  final String? description;
 
   factory Work.fromJson(Map<String, dynamic> json) {
     final createdAt = json['created_at'] as String?;
@@ -36,9 +27,21 @@ final class Work extends Equatable {
       lat: json['lat'] as double? ?? 0,
       lng: json['lng'] as double? ?? 0,
       title: json['title'] as String? ?? '',
+      address: json['address'] as String? ?? '',
       description: json['description'] as String?,
     );
   }
+
+  final String id;
+  final String ownerId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String placeId;
+  final double lat;
+  final double lng;
+  final String title;
+  final String address;
+  final String? description;
 
   @override
   List<Object?> get props => [
@@ -50,6 +53,7 @@ final class Work extends Equatable {
         lat,
         lng,
         title,
+        address,
         description,
       ];
 }
