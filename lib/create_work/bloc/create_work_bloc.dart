@@ -194,34 +194,32 @@ class CreateWorkBloc extends Bloc<CreateWorkEvent, CreateWorkState> {
     );
 
     final place = state.place.toNullable()!;
-    emit(
-      state.copyWith(
-        submission: await _workRepository
-            .insertWork(
-              Work(
-                ownerId: _appUserRepository.currentUser.match(
-                  () => '',
-                  (appUser) => appUser.id,
-                ),
-                title: state.title.value,
-                description: state.description.value.isEmpty
-                    ? null
-                    : state.description.value,
-                placeId: place.id,
-                lat: place.lat,
-                lng: place.lng,
-              ),
-            )
-            .match(
-              (error) => Submission(
-                status: FormzSubmissionStatus.failure,
-                errorMessage: _saveWorkErrorMessage(error),
-              ),
-              (_) => const Submission(status: FormzSubmissionStatus.success),
-            )
-            .run(),
-      ),
-    );
+    final submission = await _workRepository
+        .insertWork(
+          Work(
+            ownerId: _appUserRepository.currentUser.match(
+              () => '',
+              (appUser) => appUser.id,
+            ),
+            title: state.title.value,
+            description: state.description.value.isEmpty
+                ? null
+                : state.description.value,
+            placeId: place.id,
+            lat: place.lat,
+            lng: place.lng,
+            address: place.address,
+          ),
+        )
+        .match(
+          (error) => Submission(
+            status: FormzSubmissionStatus.failure,
+            errorMessage: _saveWorkErrorMessage(error),
+          ),
+          (_) => const Submission(status: FormzSubmissionStatus.success),
+        )
+        .run();
+    emit(state.copyWith(submission: submission));
   }
 
   String _saveWorkErrorMessage(SaveWorkError error) {

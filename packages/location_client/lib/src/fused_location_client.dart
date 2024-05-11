@@ -11,17 +11,6 @@ final class FusedLocationClient implements LocationClient {
     LocationSettings? settings,
   }) =>
       Geolocator.getPositionStream(locationSettings: settings);
-  // Either.tryCatch(
-  //   () => Geolocator.getPositionStream(locationSettings: settings),
-  //   (error, _) => switch (error) {
-  //     final TimeoutException e =>
-  //       GenericError.fromException(e, code: 'timeout'),
-  //     final LocationServiceDisabledException e =>
-  //       GenericError.fromException(e, code: 'disabled'),
-  //     final Exception e => GenericError.fromException(e),
-  //     _ => const GenericError.unknown(),
-  //   },
-  // );
 
   @override
   Task<bool> isLocationServiceEnabled() {

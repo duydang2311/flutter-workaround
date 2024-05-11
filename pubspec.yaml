@@ -35,6 +35,7 @@ dependencies:
   http: ^1.2.1
   image_picker: ^1.1.0
   intl: ^0.18.1
+  jiffy: ^6.2.1
   latlong2: ^0.9.1
   location_client:
     path: packages/location_client
