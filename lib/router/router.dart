@@ -10,6 +10,7 @@ import 'package:workaround/profile/view/profile_page.dart';
 import 'package:workaround/sign_in/sign_in.dart';
 import 'package:workaround/sign_up/sign_up.dart';
 import 'package:workaround/splash/splash.dart';
+import 'package:workaround/work/work.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _homeNavigatorKey = GlobalKey<NavigatorState>();
@@ -96,6 +97,13 @@ final router = GoRouter(
           ),
         );
       },
+    ),
+    GoRoute(
+      name: 'works',
+      path: '/works/:id',
+      pageBuilder: (context, state) => MaterialPage(
+        child: WorkPage(id: state.pathParameters['id']!),
+      ),
     ),
     GoRoute(
       path: '/sign-in',

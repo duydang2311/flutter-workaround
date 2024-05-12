@@ -121,7 +121,7 @@ final class SupabaseWorkRepository implements WorkRepository {
   }
 
   @override
-  TaskEither<GenericError, Work> getWorkById(
+  TaskEither<GenericError, Map<String, dynamic>> getWorkById(
     String id, {
     String columns = '*',
   }) {
@@ -133,17 +133,15 @@ final class SupabaseWorkRepository implements WorkRepository {
           .limit(1)
           .maybeSingle(),
       _catchGenericError,
-    )
-        .flatMap(
-          (r) => TaskEither.fromNullable(
-            r,
-            () => const GenericError(
-              message: 'Work not found',
-              code: 'not_found',
-            ),
-          ),
-        )
-        .map(Work.fromJson);
+    ).flatMap(
+      (r) => TaskEither.fromNullable(
+        r,
+        () => const GenericError(
+          message: 'Unable to find work.',
+          code: 'not_found',
+        ),
+      ),
+    );
   }
 
   @override

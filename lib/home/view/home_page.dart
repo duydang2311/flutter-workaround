@@ -92,7 +92,12 @@ final class _WorkList extends StatelessWidget {
             final work = state.works[index];
             return ListTile(
               key: ValueKey(work.id),
-              onTap: () {},
+              onTap: () {
+                GoRouter.of(context).pushNamed(
+                  'works',
+                  pathParameters: {'id': work.id},
+                );
+              },
               title: Text(work.title),
               subtitle: work.description.match(
                 () => null,
