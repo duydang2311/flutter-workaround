@@ -167,7 +167,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     await _workRepository
         .getWorkById(
       event.id,
-      columns: 'description',
+      columns: 'description, owner:owner_id(display_name)',
     )
         .match((l) {
       emit(state.copyWith(error: Option.of(UiError.now(message: l.message))));
@@ -226,9 +226,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               r.map(
                 (e) => MapWork(
                   id: e.id,
+                  ownerName: e.ownerName,
+                  createdAt: e.createdAt,
                   title: e.title,
                   lat: e.lat,
                   lng: e.lng,
+                  address: e.address,
                   distance: e.distance,
                 ),
               ),
@@ -311,9 +314,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           r.map(
             (e) => MapWork(
               id: e.id,
+              createdAt: e.createdAt,
+              ownerName: e.ownerName,
               title: e.title,
               lat: e.lat,
               lng: e.lng,
+              address: e.address,
               distance: e.distance,
             ),
           ),
