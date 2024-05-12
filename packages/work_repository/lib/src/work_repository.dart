@@ -6,7 +6,10 @@ import 'package:work_repository/work_repository.dart';
 abstract interface class WorkRepository {
   Stream<PostgresChangePayload> get stream;
   TaskEither<SaveWorkError, void> insertWork(Work work);
-  TaskEither<GenericError, Work> getWorkById(String id, {String columns = '*'});
+  TaskEither<GenericError, Map<String, dynamic>> getWorkById(
+    String id, {
+    String columns = '*',
+  });
   TaskEither<GenericError, List<NearbyWork>> getNearbyWorks(
     double lat,
     double lng, {

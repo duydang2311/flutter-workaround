@@ -167,7 +167,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     await _workRepository
         .getWorkById(
       event.id,
-      columns: 'owner_id, created_at, title, description',
+      columns: 'description',
     )
         .match((l) {
       emit(state.copyWith(error: Option.of(UiError.now(message: l.message))));
@@ -179,7 +179,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             ...state.mapWorks,
             if (work != null)
               event.id: work.copyWith(
-                description: Option.fromNullable(r.description),
+                description: Option.fromNullable(r['description'] as String?),
                 popupStatus: PopupStatus.none,
               ),
           },
