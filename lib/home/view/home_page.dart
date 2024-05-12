@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -47,19 +45,31 @@ final class _HomeView extends StatelessWidget {
         },
       ),
     );
-    return SafeArea(
-      child: RefreshIndicator(
-        onRefresh: () async {
-          final bloc = context.read<HomeBloc>()
-            ..add(const HomeRefreshRequested());
-          await bloc.stream.first;
-        },
-        child: const SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              _WorkList(),
-            ],
+
+    return BlocListener<HomeBloc, HomeState>(
+      listenWhen: (previous, current) =>
+          current.error.isSome() && previous.error != current.error,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.error.toNullable()!.message),
+          ),
+        );
+      },
+      child: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            final bloc = context.read<HomeBloc>()
+              ..add(const HomeRefreshRequested());
+            await bloc.stream.first;
+          },
+          child: const SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                _WorkList(),
+              ],
+            ),
           ),
         ),
       ),
