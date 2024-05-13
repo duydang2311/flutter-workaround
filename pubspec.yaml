@@ -12,6 +12,7 @@ dependencies:
   bloc: ^8.1.4
   collection: ^1.18.0
   cronet_http: ^1.2.0
+  dartfield: ^1.1.0
   dynamic_color: ^1.7.0
   equatable: ^2.0.5
   flutter:
@@ -49,6 +50,8 @@ dependencies:
   url_launcher: ^6.2.6
   user_repository:
     path: packages/user_repository
+  work_application_repository:
+    path: packages/work_application_repository
   work_repository:
     path: packages/work_repository
 

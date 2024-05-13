@@ -6,6 +6,11 @@ import 'package:work_repository/work_repository.dart';
 abstract interface class WorkRepository {
   Stream<PostgresChangePayload> get stream;
   TaskEither<SaveWorkError, void> insertWork(Work work);
+  TaskEither<GenericError, dynamic> update(
+    Map<String, dynamic> values, {
+    String? id,
+    String? columns,
+  });
   TaskEither<GenericError, Map<String, dynamic>> getWorkById(
     String id, {
     String columns = '*',
@@ -29,5 +34,6 @@ abstract interface class WorkRepository {
     String columns = '*',
     ColumnOrder? order,
     int? limit,
+    Map<String, dynamic>? match,
   });
 }

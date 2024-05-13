@@ -144,6 +144,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+  dartfield:
+    dependency: "direct main"
+    description:
+      name: dartfield
+      sha256: "7ef026ab37a1d526c29f9577b3c62079bd22ee2dbf9e359e240c2d390a48ddbe"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   diff_match_patch:
     dependency: transitive
     description:
@@ -1325,6 +1333,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  work_application_repository:
+    dependency: "direct main"
+    description:
+      path: "packages/work_application_repository"
+      relative: true
+    source: path
+    version: "0.1.0+1"
   work_repository:
     dependency: "direct main"
     description:

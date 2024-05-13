@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:workaround/map/map.dart';
 
 final class WorkPopup extends StatelessWidget {

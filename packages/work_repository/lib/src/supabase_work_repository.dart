@@ -31,8 +31,28 @@ final class SupabaseWorkRepository implements WorkRepository {
         'place_id': work.placeId,
         'location': 'point(${work.lng} ${work.lat})',
         'address': work.address,
+        'status': WorkStatus.closed.name,
       }),
       _catch,
+    );
+  }
+
+  @override
+  TaskEither<GenericError, dynamic> update(
+    Map<String, dynamic> values, {
+    String? id,
+    String? columns,
+  }) {
+    PostgrestTransformBuilder<dynamic> builder =
+        _supabase.client.from('works').update(values).match({
+      if (id != null) 'id': id,
+    });
+    if (columns != null) {
+      builder = builder.select(columns);
+    }
+    return TaskEither.tryCatch(
+      () => builder,
+      _catchGenericError,
     );
   }
 
@@ -84,6 +104,7 @@ final class SupabaseWorkRepository implements WorkRepository {
 
   GenericError _catchGenericError(Object error, StackTrace stackTrace) {
     return switch (error) {
+      final PostgrestException e => GenericError.fromPostgrestException(e),
       final AuthException e => GenericError.fromAuthException(e),
       final Exception e => GenericError.fromException(e),
       _ => const GenericError.unknown()
@@ -151,9 +172,13 @@ final class SupabaseWorkRepository implements WorkRepository {
     RowRange? range,
     ColumnOrder? order,
     int? limit,
+    Map<String, dynamic>? match,
   }) {
-    PostgrestTransformBuilder<List<Map<String, dynamic>>> builder =
-        _supabase.client.from(from ?? 'works').select(columns);
+    PostgrestTransformBuilder<List<Map<String, dynamic>>> builder = _supabase
+        .client
+        .from(from ?? 'works')
+        .select(columns)
+        .match(match ?? {});
     if (order != null) {
       builder = builder.order(
         order.column,
@@ -176,7 +201,6 @@ final class SupabaseWorkRepository implements WorkRepository {
       () => builder,
       _catchGenericError,
     );
-    // .map((r) => r.map(Work.fromJson).toList());
   }
 
   @override
@@ -207,7 +231,7 @@ final class SupabaseWorkRepository implements WorkRepository {
           lat: json['lat'] as double,
           lng: json['lng'] as double,
           distance: json['distance'] as double,
-          description: json['description'] as String,
+          description: json['description'] as String?,
         );
       }).toList(),
     );

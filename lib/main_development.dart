@@ -8,6 +8,7 @@ import 'package:location_client/location_client.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:work_application_repository/work_application_repository.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/app/app.dart';
 import 'package:workaround/bootstrap.dart';
@@ -43,6 +44,8 @@ void main() {
     }
 
     final locationClient = FusedLocationClient();
+    final workApplicationRepository =
+        SupabaseWorkApplicationRepository(client: supabase.client);
 
     return App(
       authenticationRepository: authenticationRepository,
@@ -52,6 +55,7 @@ void main() {
       workRepository: workRepository,
       httpClient: httpClient,
       locationClient: locationClient,
+      workApplicationRepository: workApplicationRepository,
     );
   });
 }
