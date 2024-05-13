@@ -1,6 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -8,6 +7,7 @@ import 'package:location_client/location_client.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:work_application_repository/work_application_repository.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/authentication/bloc/authentication_bloc.dart';
 import 'package:workaround/l10n/l10n.dart';
@@ -23,6 +23,7 @@ final class App extends StatelessWidget {
     required this.workRepository,
     required this.httpClient,
     required this.locationClient,
+    required this.workApplicationRepository,
     super.key,
   });
 
@@ -33,6 +34,7 @@ final class App extends StatelessWidget {
   final WorkRepository workRepository;
   final Client httpClient;
   final LocationClient locationClient;
+  final WorkApplicationRepository workApplicationRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,7 @@ final class App extends StatelessWidget {
         RepositoryProvider.value(value: workRepository),
         RepositoryProvider.value(value: httpClient),
         RepositoryProvider.value(value: locationClient),
+        RepositoryProvider.value(value: workApplicationRepository),
       ],
       child: BlocProvider(
         create: (_) => AuthenticationBloc(

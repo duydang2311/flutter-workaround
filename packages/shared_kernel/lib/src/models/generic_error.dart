@@ -15,6 +15,14 @@ base class GenericError extends Equatable {
         message: exception.toString(),
         code: code ?? exception.statusCode ?? '',
       );
+  factory GenericError.fromPostgrestException(
+    PostgrestException exception, {
+    String? code,
+  }) =>
+      GenericError(
+        message: exception.message,
+        code: exception.code ?? code ?? '',
+      );
 
   final String code;
   final String message;

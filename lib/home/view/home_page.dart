@@ -99,71 +99,69 @@ final class _WorkList extends StatelessWidget {
                 );
               },
               title: Text(work.title),
-              subtitle: work.description.match(
-                () => null,
-                (description) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 8,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.pin_drop),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                work.address,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(width: 8),
-                            Text(work.ownerName),
-                          ],
-                        ),
-                        if (work.distance.isSome())
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.directions_walk),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${((work.distance.toNullable()! / 1000) * 10).round() / 10}km',
-                              ),
-                            ],
-                          ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.access_time_filled_rounded),
-                            const SizedBox(width: 8),
-                            Text(
-                              Jiffy.parseFromDateTime(work.createdAt).fromNow(),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 8,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.pin_drop),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              work.address,
                               overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.person),
+                          const SizedBox(width: 8),
+                          Text(work.ownerName),
+                        ],
+                      ),
+                      if (work.distance.isSome())
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.directions_walk),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${((work.distance.toNullable()! / 1000) * 10).round() / 10}km',
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.access_time_filled_rounded),
+                          const SizedBox(width: 8),
+                          Text(
+                            Jiffy.parseFromDateTime(work.createdAt).fromNow(),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (work.description.isSome())
                     Text(
-                      description,
+                      work.description.toNullable()!,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.4),
                       ),
                     ),
-                  ],
-                ),
+                ],
               ),
             );
           }),

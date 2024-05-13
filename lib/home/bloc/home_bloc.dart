@@ -107,7 +107,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                       lat: e.lat,
                       lng: e.lng,
                       distance: Option.of(e.distance),
-                      description: Option.of(e.description),
+                      description: Option.fromNullable(e.description),
                       ownerName: e.ownerName,
                     ),
                   )
@@ -117,9 +117,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       .orElse((l) => _workRepository
           .getWorks(
             from: 'home_page_works',
-            columns:
-                'id, created_at, title, lat, lng, address, description, owner:profiles!owner_id(display_name)',
+            columns: '''
+              id, created_at, title, lat, lng, address, description,
+              owner:profiles!owner_id(display_name)
+            ''',
             order: const ColumnOrder(column: 'created_at'),
+            match: {'status': WorkStatus.open.name},
           )
           .map(
             (r) => r

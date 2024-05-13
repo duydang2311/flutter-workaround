@@ -1,0 +1,4 @@
+enum WorkStatus {
+  open,
+  closed,
+}

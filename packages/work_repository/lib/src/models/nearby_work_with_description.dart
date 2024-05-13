@@ -13,7 +13,7 @@ final class NearbyWorkWithDescription extends NearbyWork {
     required this.description,
   });
 
-  final String description;
+  final String? description;
 
   @override
   List<Object?> get props => super.props..addAll([description]);
