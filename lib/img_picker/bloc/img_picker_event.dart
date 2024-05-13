@@ -14,3 +14,7 @@ final class ImgPickChange extends ImgPickerEvent {
   @override
   List<Object> get props => [file];
 }
+
+final class ImgPickerSubmitted extends ImgPickerEvent {
+  const ImgPickerSubmitted();
+}

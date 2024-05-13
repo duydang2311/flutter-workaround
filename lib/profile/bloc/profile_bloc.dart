@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -15,7 +16,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ProfileChanged>(_handleProfileChanged);
 
     _profileSubscription = profileRepository.profile.listen((profile) {
+      log("mess $profile");
       add(ProfileChanged(profile: profile));
+      
     });
   }
 

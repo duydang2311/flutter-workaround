@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:profile_repository/src/models/Profile_Error.dart';
@@ -87,5 +89,47 @@ final class SupabaseProfileRepository implements ProfileRepository {
       throw Exception('Failed to update gender: $error');
     }
   }
+
+  @override
+  Future<String> uploadAvaImg({required File img}) async {
+    try {
+      String id = "";
+      await _appUserRepository.currentUser.match(
+        () => throw Exception('No current user available'),
+        (currentUser) async {
+          id = currentUser.id;
+          await _supabase.client.storage.from('avata_img').upload(
+              currentUser.id,
+              img,
+          );
+          
+        },
+      );
+    return _supabase.client.storage.from("avata_img").getPublicUrl(id); 
+      
+    } catch(e) {
+      throw Exception('Failed to update img: $e');
+    }
+  }
+  
+  @override
+  Future<void> updateAvata(File img) async {
+   try {
+      await _appUserRepository.currentUser.match(
+        () => throw Exception('No current user available'),
+        (currentUser) async {
+          await _supabase.client.from('profiles').upsert(
+            {
+              'id': currentUser.id,
+              'image_url': await uploadAvaImg(img: img),
+            },
+          );
+        },
+      );
+    } catch (error) {
+      throw Exception('Failed to update avatar user: $error');
+    }
+  }
+  
   
 }
