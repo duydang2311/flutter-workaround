@@ -7,6 +7,7 @@ final class HomeState extends Equatable {
     this.timestamp = 0,
     this.filter = WorkFilter.all,
     this.status = UiStatus.none,
+    this.hasReachedMax = false,
   });
 
   final List<HomeWork> works;
@@ -14,6 +15,7 @@ final class HomeState extends Equatable {
   final WorkFilter filter;
   final UiStatus status;
   final int timestamp;
+  final bool hasReachedMax;
 
   HomeState copyWith({
     List<HomeWork>? works,
@@ -21,6 +23,7 @@ final class HomeState extends Equatable {
     WorkFilter? filter,
     UiStatus? status,
     int? timestamp,
+    bool? hasReachedMax,
   }) =>
       HomeState(
         works: works ?? this.works,
@@ -28,6 +31,7 @@ final class HomeState extends Equatable {
         filter: filter ?? this.filter,
         status: status ?? this.status,
         timestamp: timestamp ?? this.timestamp,
+        hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       );
 
   @override

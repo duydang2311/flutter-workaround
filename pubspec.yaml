@@ -50,6 +50,7 @@ dependencies:
   url_launcher: ^6.2.6
   user_repository:
     path: packages/user_repository
+  very_good_infinite_list: ^0.7.1
   work_application_repository:
     path: packages/work_application_repository
   work_repository:

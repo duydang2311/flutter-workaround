@@ -172,7 +172,6 @@ final class SupabaseWorkRepository implements WorkRepository {
     String columns = '*',
     RowRange? range,
     ColumnOrder? order,
-    int? limit,
     Map<String, dynamic>? match,
   }) {
     PostgrestTransformBuilder<List<Map<String, dynamic>>> builder = _supabase
@@ -188,8 +187,8 @@ final class SupabaseWorkRepository implements WorkRepository {
         referencedTable: order.referencedTable,
       );
     }
-    if (limit != null) {
-      builder = builder.limit(limit);
+    if (range != null) {
+      builder = builder.range(range.from, range.to);
     }
     if (range != null) {
       builder = builder.range(
@@ -213,6 +212,7 @@ final class SupabaseWorkRepository implements WorkRepository {
     int? limit,
     int descriptionLength = 80,
     String? ownerId,
+    int? offset,
   }) {
     return TaskEither.tryCatch(
       () => _supabase.client.rpc<dynamic>(
@@ -224,6 +224,7 @@ final class SupabaseWorkRepository implements WorkRepository {
           'max_rows': limit ?? 10,
           'description_length': descriptionLength,
           if (ownerId != null) 'owner_id': ownerId,
+          'skipped_rows': offset ?? 0,
         },
       ),
       _catchGenericError,

@@ -5,6 +5,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:location_client/location_client.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 import 'package:work_repository/work_repository.dart' hide Work;
 import 'package:workaround/home/home.dart';
 import 'package:workaround/home_scaffold/home_scaffold.dart';
@@ -42,8 +43,8 @@ final class _HomeView extends StatelessWidget {
         scaffoldMap: {
           ...bloc.state.scaffoldMap,
           'home': ScaffoldData(
-            appBar: const ThemedAppBar(
-              title: ThemedAppBarTitle('Home'),
+            appBar: ThemedAppBar(
+              title: const ThemedAppBarTitle('Home'),
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
@@ -116,14 +117,7 @@ final class _HomeView extends StatelessWidget {
               ..add(const HomeRefreshRequested());
             await bloc.stream.first;
           },
-          child: const SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                _WorkList(),
-              ],
-            ),
-          ),
+          child: const _WorkList(),
         ),
       ),
     );
@@ -141,96 +135,104 @@ final class _WorkList extends StatelessWidget {
           (previous.works, previous.status) != (current.works, current.status),
       builder: (context, state) => Skeletonizer(
         enabled: state.status.isLoading,
-        child: Column(
-          children: ListTile.divideTiles(
-            context: context,
-            tiles: List.generate(state.works.length, (index) {
-              final work = state.works[index];
-              return ListTile(
-                key: ValueKey(work.id),
-                onTap: () async {
-                  final changed = await GoRouter.of(context).pushNamed(
-                    'works',
-                    pathParameters: {'id': work.id},
-                  );
-                  if (context.mounted && changed is Work) {
-                    context.read<HomeBloc>().add(HomeWorkChanged(
-                        id: changed.id, status: changed.status));
-                  }
-                },
-                title: Text(work.title),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 8,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.pin_drop),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                work.address,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+        child: InfiniteList(
+          onFetchData: () {
+            context.read<HomeBloc>().add(const HomeMoreWorksRequested());
+          },
+          isLoading: state.status.isLoading,
+          itemCount: state.works.length,
+          hasReachedMax: state.hasReachedMax,
+          separatorBuilder: (_, __) => const Divider(height: 0),
+          itemBuilder: (context, index) {
+            final work = state.works[index];
+            return ListTile(
+              key: ValueKey(work.id),
+              onTap: () async {
+                final changed = await GoRouter.of(context).pushNamed(
+                  'works',
+                  pathParameters: {'id': work.id},
+                );
+                if (context.mounted && changed is Work) {
+                  context.read<HomeBloc>().add(
+                        HomeWorkChanged(
+                          id: changed.id,
+                          status: changed.status,
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(width: 8),
-                            Text(work.ownerName),
-                          ],
-                        ),
-                        if (work.distance.isSome())
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.directions_walk),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${((work.distance.toNullable()! / 1000) * 10).round() / 10}km',
-                              ),
-                            ],
-                          ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.access_time_filled_rounded),
-                            const SizedBox(width: 8),
-                            Text(
-                              Jiffy.parseFromDateTime(work.createdAt).fromNow(),
+                      );
+                }
+              },
+              title: Text(work.title),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 8,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.pin_drop),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              work.address,
                               overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.person),
+                          const SizedBox(width: 8),
+                          Text(work.ownerName),
+                        ],
+                      ),
+                      if (work.distance.isSome())
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.directions_walk),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${((work.distance.toNullable()! / 1000) * 10).round() / 10}km',
+                            ),
                           ],
                         ),
-                        if (work.status.isClosed)
-                          Icon(
-                            Icons.lock_rounded,
-                            color: colorScheme.error,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.access_time_filled_rounded),
+                          const SizedBox(width: 8),
+                          Text(
+                            Jiffy.parseFromDateTime(work.createdAt).fromNow(),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (work.description.isSome())
-                      Text(
-                        work.description.toNullable()!,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: TextStyle(
-                          color: colorScheme.onSurface.withOpacity(0.4),
-                        ),
+                        ],
                       ),
-                  ],
-                ),
-              );
-            }),
-          ).toList(),
+                      if (work.status.isClosed)
+                        Icon(
+                          Icons.lock_rounded,
+                          color: colorScheme.error,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (work.description.isSome())
+                    Text(
+                      work.description.toNullable()!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.4),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
