@@ -33,3 +33,7 @@ final class HomeWorkChanged extends HomeEvent {
   @override
   List<Object> get props => [id, status];
 }
+
+final class HomeMoreWorksRequested extends HomeEvent {
+  const HomeMoreWorksRequested();
+}

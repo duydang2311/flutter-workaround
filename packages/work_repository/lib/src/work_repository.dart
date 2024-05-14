@@ -29,12 +29,13 @@ abstract interface class WorkRepository {
     int? limit,
     int descriptionLength = 80,
     String? ownerId,
+    int? offset,
   });
   TaskEither<GenericError, List<Map<String, dynamic>>> getWorks({
     String? from,
     String columns = '*',
     ColumnOrder? order,
-    int? limit,
+    RowRange? range,
     Map<String, dynamic>? match,
   });
 }
