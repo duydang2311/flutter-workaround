@@ -26,10 +26,28 @@ final class WorkPage extends StatelessWidget {
       )..add(const WorkInitialized()),
       child: Scaffold(
         appBar: AppBar(
+          leading: BlocBuilder<WorkBloc, WorkState>(
+            builder: (context, state) => IconButton(
+              icon: const Icon(Icons.chevron_left_rounded),
+              onPressed: () {
+                Navigator.of(context).pop(state.work.toNullable());
+              },
+            ),
+          ),
           title: _WorkAppBarTitle(),
         ),
         floatingActionButton: _WorkFloatingActionButton(),
-        body: const _WorkView(),
+        body: BlocBuilder<WorkBloc, WorkState>(
+          builder: (context, state) => PopScope(
+            canPop: false,
+            onPopInvoked: (didPop) {
+              if (!didPop) {
+                Navigator.of(context).pop(state.work.toNullable());
+              }
+            },
+            child: const _WorkView(),
+          ),
+        ),
       ),
     );
   }

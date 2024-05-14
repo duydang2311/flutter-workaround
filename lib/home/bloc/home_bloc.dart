@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location_client/location_client.dart';
 import 'package:shared_kernel/shared_kernel.dart';
+import 'package:user_repository/user_repository.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/home/home.dart';
 
@@ -12,17 +13,23 @@ part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({
+    required WorkFilter filter,
     required WorkRepository workRepository,
     required LocationClient locationClient,
+    required AppUserRepository appUserRepository,
   })  : _workRepository = workRepository,
         _locationClient = locationClient,
-        super(const HomeState()) {
+        _appUserRepository = appUserRepository,
+        super(HomeState(filter: filter)) {
     on<HomeInitialized>(_handleInitialized);
     on<HomeRefreshRequested>(_handleRefreshRequested);
+    on<HomeWorkFilterChanged>(_handleWorkFilterChanged);
+    on<HomeWorkChanged>(_handleWorkChanged);
   }
 
   final WorkRepository _workRepository;
   final LocationClient _locationClient;
+  final AppUserRepository _appUserRepository;
 
   Future<void> _handleInitialized(
     HomeInitialized event,
@@ -51,6 +58,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeRefreshRequested event,
     Emitter<HomeState> emit,
   ) async {
+    emit(state.copyWith(status: UiStatus.loading));
     final works = await _getHomeWorks.match(
       (l) {
         emit(
@@ -64,8 +72,49 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ).run();
     emit(
       state.copyWith(
+        status: UiStatus.none,
         works: works,
         timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
+  }
+
+  Future<void> _handleWorkFilterChanged(
+    HomeWorkFilterChanged event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(
+      state.copyWith(status: UiStatus.loading, filter: event.filter),
+    );
+    final works = await _getHomeWorks.match(
+      (l) {
+        emit(
+          state.copyWith(
+            error: Option.of(UiError.now(message: l.formatted)),
+          ),
+        );
+        return <HomeWork>[];
+      },
+      (r) => r,
+    ).run();
+    emit(
+      state.copyWith(
+        status: UiStatus.none,
+        works: works,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
+  }
+
+  void _handleWorkChanged(
+    HomeWorkChanged event,
+    Emitter<HomeState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        works: state.works
+            .map((e) => e.id != event.id ? e : e.copyWith(status: event.status))
+            .toList(),
       ),
     );
   }
@@ -95,6 +144,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               r.longitude,
               limit: 10,
               descriptionLength: 160,
+              ownerId: switch (state.filter) {
+                WorkFilter.own =>
+                  _appUserRepository.currentUser.toNullable()!.id,
+                _ => null,
+              },
             )
             .map(
               (r) => r
@@ -106,40 +160,48 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                       address: e.address,
                       lat: e.lat,
                       lng: e.lng,
+                      ownerName: e.ownerName,
+                      status: e.status,
                       distance: Option.of(e.distance),
                       description: Option.fromNullable(e.description),
-                      ownerName: e.ownerName,
                     ),
                   )
                   .toList(),
             ),
       )
-      .orElse((l) => _workRepository
-          .getWorks(
-            from: 'home_page_works',
-            columns: '''
-              id, created_at, title, lat, lng, address, description,
+      .orElse(
+        (l) => _workRepository
+            .getWorks(
+              from: 'home_page_works',
+              columns: '''
+              id, created_at, title, lat, lng, address, status, description,
               owner:profiles!owner_id(display_name)
             ''',
-            order: const ColumnOrder(column: 'created_at'),
-            match: {'status': WorkStatus.open.name},
-          )
-          .map(
-            (r) => r
-                .map(
-                  (e) => HomeWork(
-                    id: e['id'] as String,
-                    ownerName: (e['owner']
-                        as Map<String, dynamic>)['display_name'] as String,
-                    createdAt: DateTime.parse(e['created_at'] as String),
-                    title: e['title'] as String,
-                    address: e['address'] as String,
-                    lat: e['lat'] as double,
-                    lng: e['lng'] as double,
-                    description:
-                        Option.fromNullable(e['description'] as String?),
-                  ),
-                )
-                .toList(),
-          ));
+              order: const ColumnOrder(column: 'created_at'),
+              match: {
+                'status': WorkStatus.open.name,
+                if (state.filter.isOwn)
+                  'owner_id': _appUserRepository.currentUser.toNullable()!.id,
+              },
+            )
+            .map(
+              (r) => r
+                  .map(
+                    (e) => HomeWork(
+                      id: e['id'] as String,
+                      ownerName: (e['owner']
+                          as Map<String, dynamic>)['display_name'] as String,
+                      createdAt: DateTime.parse(e['created_at'] as String),
+                      title: e['title'] as String,
+                      address: e['address'] as String,
+                      lat: e['lat'] as double,
+                      lng: e['lng'] as double,
+                      status: WorkStatus.values.byName(e['status'] as String),
+                      description:
+                          Option.fromNullable(e['description'] as String?),
+                    ),
+                  )
+                  .toList(),
+            ),
+      );
 }

@@ -60,6 +60,7 @@ final class HomeScaffold extends StatelessWidget {
             },
           ),
           floatingActionButton: scaffoldData?.floatingActionButton,
+          drawer: scaffoldData?.drawer,
           body: navigationShell,
         );
       },

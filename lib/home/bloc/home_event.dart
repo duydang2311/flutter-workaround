@@ -14,3 +14,22 @@ final class HomeInitialized extends HomeEvent {
 final class HomeRefreshRequested extends HomeEvent {
   const HomeRefreshRequested();
 }
+
+final class HomeWorkFilterChanged extends HomeEvent {
+  const HomeWorkFilterChanged(this.filter);
+
+  final WorkFilter filter;
+
+  @override
+  List<Object> get props => [filter];
+}
+
+final class HomeWorkChanged extends HomeEvent {
+  const HomeWorkChanged({required this.id, required this.status});
+
+  final String id;
+  final WorkStatus status;
+
+  @override
+  List<Object> get props => [id, status];
+}

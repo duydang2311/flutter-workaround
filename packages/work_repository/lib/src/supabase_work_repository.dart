@@ -86,6 +86,7 @@ final class SupabaseWorkRepository implements WorkRepository {
           lat: json['lat'] as double,
           lng: json['lng'] as double,
           distance: json['distance'] as double,
+          status: WorkStatus.values.byName(json['status'] as String),
         );
       }).toList(),
     );
@@ -205,8 +206,14 @@ final class SupabaseWorkRepository implements WorkRepository {
 
   @override
   TaskEither<GenericError, List<NearbyWorkWithDescription>>
-      getNearbyWorksWithDescription(double lat, double lng,
-          {double? kmRadius, int? limit, int descriptionLength = 80}) {
+      getNearbyWorksWithDescription(
+    double lat,
+    double lng, {
+    double? kmRadius,
+    int? limit,
+    int descriptionLength = 80,
+    String? ownerId,
+  }) {
     return TaskEither.tryCatch(
       () => _supabase.client.rpc<dynamic>(
         'works_get_nearby_with_desc',
@@ -216,6 +223,7 @@ final class SupabaseWorkRepository implements WorkRepository {
           if (kmRadius != null) 'radius': kmRadius * 1000,
           'max_rows': limit ?? 10,
           'description_length': descriptionLength,
+          if (ownerId != null) 'owner_id': ownerId,
         },
       ),
       _catchGenericError,
@@ -232,6 +240,7 @@ final class SupabaseWorkRepository implements WorkRepository {
           lng: json['lng'] as double,
           distance: json['distance'] as double,
           description: json['description'] as String?,
+          status: WorkStatus.values.byName(json['status'] as String),
         );
       }).toList(),
     );
