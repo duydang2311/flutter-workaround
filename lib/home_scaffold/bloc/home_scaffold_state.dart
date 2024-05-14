@@ -31,11 +31,13 @@ final class ScaffoldData extends Equatable {
   const ScaffoldData({
     this.appBar,
     this.floatingActionButton,
+    this.drawer,
   });
 
   final PreferredSizeWidget? appBar;
   final Widget? floatingActionButton;
+  final Widget? drawer;
 
   @override
-  List<Object?> get props => [appBar, floatingActionButton];
+  List<Object?> get props => [appBar, floatingActionButton, drawer];
 }

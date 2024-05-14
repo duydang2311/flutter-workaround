@@ -28,6 +28,7 @@ abstract interface class WorkRepository {
     double? kmRadius,
     int? limit,
     int descriptionLength = 80,
+    String? ownerId,
   });
   TaskEither<GenericError, List<Map<String, dynamic>>> getWorks({
     String? from,

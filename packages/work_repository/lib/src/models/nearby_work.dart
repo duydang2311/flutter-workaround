@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:work_repository/work_repository.dart';
 
 class NearbyWork extends Equatable {
   const NearbyWork({
@@ -10,6 +11,7 @@ class NearbyWork extends Equatable {
     required this.lat,
     required this.lng,
     required this.distance,
+    required this.status,
   });
 
   final String id;
@@ -20,8 +22,18 @@ class NearbyWork extends Equatable {
   final double lat;
   final double lng;
   final double distance;
+  final WorkStatus status;
 
   @override
-  List<Object?> get props =>
-      [id, createdAt, ownerName, title, address, lat, lng, distance];
+  List<Object?> get props => [
+        id,
+        createdAt,
+        ownerName,
+        title,
+        address,
+        lat,
+        lng,
+        distance,
+        status,
+      ];
 }

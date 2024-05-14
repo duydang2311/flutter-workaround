@@ -10,6 +10,7 @@ final class NearbyWorkWithDescription extends NearbyWork {
     required super.lat,
     required super.lng,
     required super.distance,
+    required super.status,
     required this.description,
   });
 

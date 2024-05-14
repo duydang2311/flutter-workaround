@@ -1,4 +1,7 @@
 enum WorkStatus {
   open,
-  closed,
+  closed;
+
+  bool get isOpen => this == WorkStatus.open;
+  bool get isClosed => this == WorkStatus.closed;
 }
