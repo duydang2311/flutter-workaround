@@ -6,6 +6,8 @@ publish_to: none
 environment:
   sdk: "^3.3.0"
 
+dependency_overrides:
+  logger: 2.2.0
 dependencies:
   animations: ^2.0.11
   authentication_repository:
