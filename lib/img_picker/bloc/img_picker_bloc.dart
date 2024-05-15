@@ -25,10 +25,13 @@ class ImgPickerBloc extends Bloc<ImgPickerEvent, ImgPickerState> {
          ImgPickChange event,
     Emitter<ImgPickerState> emit,
       ) {
-        final file = (event.file);
+        final file = event.file;
+        final isValid = file != null;
+
     emit(
       state.copyWith(
         file: file,
+        isValid: isValid,
         ),
       );
     }

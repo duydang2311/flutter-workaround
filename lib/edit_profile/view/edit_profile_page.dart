@@ -7,6 +7,7 @@ import 'package:workaround/edit_profile/models/models.dart';
 import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/theme/theme.dart';
+import 'package:intl/intl.dart';
 
 final class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
@@ -97,7 +98,10 @@ final class _EditProfileView extends StatelessWidget {
                             color: Colors.blue,
                             child: IconButton(
                               iconSize: 26,
-                            onPressed: () => context.go('/profile/edit/edit-avatar'),                                
+                            onPressed: ()  async {
+                              await context.push('/profile/edit/edit-avatar');
+                              context.read<EditProfileBloc>().add(const EditProfileRefreshRequested());
+                            },                                
                             icon: const Icon(
                                 color: Colors.white,
                                 Icons.add_a_photo,
@@ -145,8 +149,9 @@ class _NameInput extends StatelessWidget {
             decoration: InputDecoration(
               labelText: 'Display name',
               suffixIcon: InkWell(
-                onTap: () {
-                  context.go('/profile/edit/edit-display-name');
+                onTap: () async {
+                 await context.push('/profile/edit/edit-display-name');
+                 context.read<EditProfileBloc>().add(const EditProfileRefreshRequested());
                 },
                 child: const Icon(
                   Icons.edit,
@@ -174,14 +179,15 @@ class _DobInput extends StatelessWidget {
                   readOnly: true,
                   controller: TextEditingController(
                     text: profile.dob != null
-                        ? profile.dob.toString()
+                        ? DateFormat('yyyy-MM-dd').format(profile.dob!)
                         : 'DD/MM/YYYY',
                   ),
                   decoration: InputDecoration(
                     labelText: 'Date of Birth',
                     suffixIcon: InkWell(
-                      onTap: () {
-                        context.go('/profile/edit/edit-dob');
+                      onTap: () async {
+                        await context.push('/profile/edit/edit-dob');
+                        context.read<EditProfileBloc>().add(const EditProfileRefreshRequested());
                       },
                       child: const Icon(Icons.calendar_today),
                     ),
@@ -213,8 +219,9 @@ class _GenderInput extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Gender',
                     suffixIcon: InkWell(
-                      onTap: () {
-                        context.go('/profile/edit/edit-gender');
+                      onTap: () async {
+                        await context.push('/profile/edit/edit-gender');
+                        context.read<EditProfileBloc>().add(const EditProfileRefreshRequested());
                       },
                       child: const Icon(Icons.person),
                     ),

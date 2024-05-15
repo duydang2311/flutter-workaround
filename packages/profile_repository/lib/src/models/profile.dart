@@ -26,7 +26,18 @@ final class Profile extends Equatable {
       gender: (data['gender'] ?? '') as String,
     );
   }
-
+  factory Profile.fromMap(Map<String, dynamic> data) {
+    return Profile(
+      id: data['id'] as String? ?? '',
+      createdAt: _tryParseDateTime(data['created_at']),
+      updatedAt: _tryParseDateTime(data['updated_at']),
+      userName: data['user_name'] as String? ?? '',
+      displayName: data['display_name'] as String? ?? '',
+      imageUrl: data['image_url'] as String? ?? '',
+      dob: _tryParseDateTimeDob(data['dob']),
+      gender: data['gender'] as String? ?? '',
+    );
+  }
   static Profile? tryParse(Map<String, dynamic> data) {
     final id = data['id'] as String;
     if (id.isEmpty) return null;

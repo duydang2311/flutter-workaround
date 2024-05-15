@@ -43,7 +43,7 @@ class _EditNameInputView extends StatelessWidget {
         ),
       );
   }
-  void _sucess(BuildContext context) {
+  Future<void> _sucess(BuildContext context) async {
     final l10n = context.l10n;
     
     const message = 'Success update';
@@ -55,7 +55,7 @@ class _EditNameInputView extends StatelessWidget {
         ),
       );
 
-      context.pop();
+     context.pop();
   }
 
   @override

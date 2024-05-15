@@ -18,6 +18,16 @@ final class EditProfileChanged extends EditProfileEvent {
   List<Object> get props => [profile];
 }
 
+final class EditProfileRefreshRequested
+ extends EditProfileEvent {
+  const EditProfileRefreshRequested
+();
+
+
+  @override
+  List<Object> get props => [];
+}
+
 
 final class EditProfileNameChange extends EditProfileEvent {
   const EditProfileNameChange(this.name);
@@ -26,3 +36,5 @@ final class EditProfileNameChange extends EditProfileEvent {
   @override
   List<Object> get props => [name];
 }
+
+

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:bloc/bloc.dart';
@@ -13,17 +14,26 @@ part 'edit_profile_state.dart';
 
 class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   EditProfileBloc({required ProfileRepository profileRepository})
-      : super(
+      : _profileRepository = profileRepository,
+       super(
             const EditProfileState(profile: Option.none(), name: Name.pure())) {
     on<EditProfileChanged>(_handleEditProfileChanged);
     on<EditProfileNameChange>(_onEditProfileNameChanged);
+    on<EditProfileRefreshRequested>(_handleProfileRefreshRequested);
 
     _profileSubscription = profileRepository.profile.listen((profile) {
       add(EditProfileChanged(profile: profile));
     });
   }
+  final ProfileRepository _profileRepository;
   late final StreamSubscription<Option<Profile>> _profileSubscription;
-
+  
+  Future<void> _handleProfileRefreshRequested(
+        EditProfileRefreshRequested event, Emitter<EditProfileState> emit
+  ) async { 
+    final profile = await _profileRepository.fetchProfile();
+    emit(state.copyWith(profile: profile, status: Status.ready)) ;
+  }
   void _handleEditProfileChanged(
       EditProfileChanged event, Emitter<EditProfileState> emit) {
     emit(state.copyWith(profile: event.profile, status: Status.ready));

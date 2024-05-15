@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,7 @@ import 'package:workaround/edit_dob_input/bloc/edit_dob_input_bloc.dart';
 import 'package:workaround/l10n/l10n.dart';
 import 'package:workaround/sign_up/models/models.dart';
 import 'package:workaround/theme/theme.dart';
+import 'package:intl/intl.dart'; 
 
 final class EditDobInputPage extends StatelessWidget {
   const EditDobInputPage({super.key});
@@ -187,8 +187,7 @@ class _InputDob extends StatelessWidget {
     return BlocBuilder<EditDobInputBloc, EditDobInputState>(
       builder: (context, state) {
         final dob = state.dob.value;
-        final formattedDate =
-            dob != null ? '${dob.toLocal()}'.split(' ')[0] : '';
+        final formattedDate = dob != null ? DateFormat('yyyy-MM-dd').format(dob) : '';
 
         return InputDecorator(
           decoration: const InputDecoration(

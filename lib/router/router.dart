@@ -71,10 +71,7 @@ final router = GoRouter(
                 GoRoute(
                   name: 'edit-profile',
                   path: 'edit',
-                  pageBuilder: (context, state) => const MaterialPage(
-                    key: ValueKey('edit_profile'),
-                    child: EditProfilePage(),
-                  ),
+                  builder: (context, state) => const EditProfilePage(),
                   routes: [
                     GoRoute(
                       path: 'edit-display-name',

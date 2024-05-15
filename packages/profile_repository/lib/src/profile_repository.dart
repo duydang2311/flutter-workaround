@@ -8,6 +8,8 @@ abstract interface class ProfileRepository {
   ProfileRepository(BuildContext context);
 
   Stream<Option<Profile>> get profile;
+  
+  Future<Option<Profile>> fetchProfile();
 
   Future<void> updateDisplayName(String newDisplayName);
 
