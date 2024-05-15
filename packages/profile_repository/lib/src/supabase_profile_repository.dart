@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:profile_repository/profile_repository.dart';
 import 'package:profile_repository/src/models/Profile_Error.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
+
 
 final class SupabaseProfileRepository implements ProfileRepository {
   const SupabaseProfileRepository({
@@ -130,6 +132,30 @@ final class SupabaseProfileRepository implements ProfileRepository {
       throw Exception('Failed to update avatar user: $error');
     }
   }
+  
+  @override
+Future<Option<Profile>> fetchProfile() async {
+  try {
+    return await _appUserRepository.currentUser.fold(
+      () async => none(), // No current user available
+      (currentUser) async {
+        final response = await _supabase.client
+            .from('profiles')
+            .select()
+            .eq('id', currentUser.id)
+            .single();
+
+        if (response.isEmpty) {
+          return none();
+        }
+        return some(Profile.fromMap(response));
+      },
+    );
+  } catch (error) {
+    throw Exception('Failed to fetch profile: $error');
+  }
+}
+
   
   
 }
