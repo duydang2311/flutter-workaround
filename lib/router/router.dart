@@ -127,36 +127,6 @@ final router = GoRouter(
                     key: state.pageKey,
                     child: const EditProfilePage(),
                   ),
-                  routes: [
-                    GoRoute(
-                      path: 'edit-display-name',
-                      pageBuilder: (context, state) => const MaterialPage(
-                        key: ValueKey('edit_display_name'),
-                        child: EditNameInputPage(),
-                      ),
-                    ),
-                    GoRoute(
-                      path: 'edit-dob',
-                      pageBuilder: (context, state) => const MaterialPage(
-                        key: ValueKey('edit_dob'),
-                        child: EditDobInputPage(),
-                      ),
-                    ),
-                    GoRoute(
-                      path: 'edit-gender',
-                      pageBuilder: (context, state) => const MaterialPage(
-                        key: ValueKey('edit_gender'),
-                        child: EditGenderInputPage(),
-                      ),
-                    ),
-                    GoRoute(
-                      path: 'edit-avatar',
-                      pageBuilder: (context, state) => const MaterialPage(
-                        key: ValueKey('edit_avatar'),
-                        child: ImagePickerPage(),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),

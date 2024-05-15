@@ -44,12 +44,13 @@ final class SupabaseProfileRepository implements ProfileRepository {
     await _appUserRepository.currentUser.match(
       () => throw Exception('No current user available'),
       (currentUser) async {
-        await _supabase.client.from('profiles').upsert(
+        await _supabase.client.from('profiles').update(
           {
-            'id': currentUser.id,
             'display_name': newDisplayName,
           },
-        );
+        ).match({
+          'id': currentUser.id
+        });
       },
     );
   }
@@ -60,12 +61,13 @@ final class SupabaseProfileRepository implements ProfileRepository {
       await _appUserRepository.currentUser.match(
         () => throw Exception('No current user available'),
         (currentUser) async {
-          await _supabase.client.from('profiles').upsert(
+          await _supabase.client.from('profiles').update(
             {
-              'id': currentUser.id,
               'dob': newDob.toIso8601String(),
             },
-          );
+          ).match({
+            'id':currentUser.id
+          });
         },
       );
     } catch (error) {
@@ -79,12 +81,13 @@ final class SupabaseProfileRepository implements ProfileRepository {
       await _appUserRepository.currentUser.match(
         () => throw Exception('No current user available'),
         (currentUser) async {
-          await _supabase.client.from('profiles').upsert(
+          await _supabase.client.from('profiles').update(
             {
-              'id': currentUser.id,
               'gender': gender,
             },
-          );
+          ).match({
+            'id':currentUser.id
+          });
         },
       );
     } catch (error) {
@@ -120,12 +123,13 @@ final class SupabaseProfileRepository implements ProfileRepository {
       await _appUserRepository.currentUser.match(
         () => throw Exception('No current user available'),
         (currentUser) async {
-          await _supabase.client.from('profiles').upsert(
+          await _supabase.client.from('profiles').update(
             {
-              'id': currentUser.id,
               'image_url': await uploadAvaImg(img: img),
             },
-          );
+          ).match({
+          'id': currentUser.id,  
+          });
         },
       );
     } catch (error) {
