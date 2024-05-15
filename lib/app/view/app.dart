@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
@@ -114,9 +115,23 @@ final class _AppViewState extends State<AppView> {
           // scrollBehavior: const MaterialScrollBehavior()
           //     .copyWith(dragDevices: PointerDeviceKind.values.toSet()),
           theme: AppTheme.build(AppTheme.lighterOutline(lightColorScheme))
-              .copyWith(extensions: [lightCustomColors]),
-          darkTheme: AppTheme.build(AppTheme.darkerOutline(darkColorScheme))
-              .copyWith(extensions: [darkCustomColors]),
+              .copyWith(
+            extensions: [lightCustomColors],
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: FadeThroughPageTransitionsBuilder(),
+              },
+            ),
+          ),
+          darkTheme:
+              AppTheme.build(AppTheme.darkerOutline(darkColorScheme)).copyWith(
+            extensions: [darkCustomColors],
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: FadeThroughPageTransitionsBuilder(),
+              },
+            ),
+          ),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,

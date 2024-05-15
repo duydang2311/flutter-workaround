@@ -22,12 +22,23 @@ final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   routes: [
     GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       name: 'splash',
       path: '/',
       pageBuilder: (context, state) =>
           const MaterialPage(key: ValueKey('splash'), child: SplashPage()),
     ),
-    StatefulShellRoute.indexedStack(
+    StatefulShellRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state, navigationShell) => navigationShell,
+      navigatorContainerBuilder: (context, navigationShell, children) =>
+          BlocProvider<HomeScaffoldBloc>(
+        create: (context) => HomeScaffoldBloc(HomeScaffoldState.empty),
+        child: HomeScaffold(
+          navigationShell: navigationShell,
+          children: children,
+        ),
+      ),
       branches: [
         StatefulShellBranch(
           navigatorKey: _homeNavigatorKey,
@@ -35,12 +46,18 @@ final router = GoRouter(
             GoRoute(
               name: 'home',
               path: '/home',
-              builder: (context, state) => const HomePage(),
+              pageBuilder: (context, state) => MaterialPage(
+                key: state.pageKey,
+                child: const HomePage(),
+              ),
               routes: [
                 GoRoute(
                   name: 'create-work',
                   path: 'create-work',
-                  builder: (context, state) => const CreateWorkPage(),
+                  pageBuilder: (context, state) => MaterialPage(
+                    key: state.pageKey,
+                    child: const CreateWorkPage(),
+                  ),
                 ),
               ],
             ),
@@ -52,7 +69,10 @@ final router = GoRouter(
             GoRoute(
               name: 'map',
               path: '/maps',
-              builder: (context, state) => const MapPage(),
+              pageBuilder: (context, state) => MaterialPage(
+                key: state.pageKey,
+                child: const MapPage(),
+              ),
             ),
           ],
         ),
@@ -67,9 +87,9 @@ final router = GoRouter(
                 GoRoute(
                   name: 'edit-profile',
                   path: 'edit',
-                  pageBuilder: (context, state) => const MaterialPage(
-                    key: ValueKey('edit_profile'),
-                    child: EditProfilePage(),
+                  pageBuilder: (context, state) => MaterialPage(
+                    key: state.pageKey,
+                    child: const EditProfilePage(),
                   ),
                 ),
               ],
@@ -88,33 +108,40 @@ final router = GoRouter(
           ],
         ),
       ],
-      pageBuilder: (context, state, navigationShell) {
-        return NoTransitionPage(
-          key: state.pageKey,
-          child: BlocProvider<HomeScaffoldBloc>(
-            create: (context) => HomeScaffoldBloc(HomeScaffoldState.empty),
-            child: HomeScaffold(navigationShell: navigationShell),
-          ),
-        );
-      },
+      // pageBuilder: (context, state, navigationShell) {
+      //   log('_rebuld');
+      //   return NoTransitionPage(
+      //     key: state.pageKey,
+      //     child: BlocProvider<HomeScaffoldBloc>(
+      //       create: (context) => HomeScaffoldBloc(HomeScaffoldState.empty),
+      //       child: HomeScaffold(navigationShell: navigationShell),
+      //     ),
+      //   );
+      // },
     ),
     GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       name: 'works',
       path: '/works/:id',
       pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
         child: WorkPage(id: state.pathParameters['id']!),
       ),
     ),
     GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: '/sign-in',
-      pageBuilder: (context, state) => const MaterialPage(
-        child: SignInPage(),
+      pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
+        child: const SignInPage(),
       ),
     ),
     GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: '/sign-up',
-      pageBuilder: (context, state) => const MaterialPage(
-        child: SignUpPage(),
+      pageBuilder: (context, state) => MaterialPage(
+        key: state.pageKey,
+        child: const SignUpPage(),
       ),
     ),
   ],
