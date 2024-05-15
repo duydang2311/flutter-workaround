@@ -21,6 +21,16 @@ abstract interface class WorkApplicationRepository {
     int? limit,
     String columns = '*',
   });
+  TaskEither<GenericError, List<Map<String, dynamic>>> getMany({
+    String? from,
+    String columns = '*',
+    String? id,
+    String? workId,
+    String? applicantId,
+    RowRange? range,
+    ColumnOrder? order,
+    Map<String, dynamic>? match,
+  });
   TaskEither<GenericError, int> countByWorkId(
     String id, {
     String columns = '*',

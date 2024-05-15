@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:location_client/location_client.dart';
 import 'package:shared_kernel/shared_kernel.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:work_application_repository/work_application_repository.dart';
 import 'package:work_repository/work_repository.dart';
 import 'package:workaround/home/home.dart';
 
@@ -17,9 +18,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required WorkRepository workRepository,
     required LocationClient locationClient,
     required AppUserRepository appUserRepository,
+    required WorkApplicationRepository workApplicationRepository,
   })  : _workRepository = workRepository,
         _locationClient = locationClient,
         _appUserRepository = appUserRepository,
+        _workApplicationRepository = workApplicationRepository,
         super(HomeState(filter: filter)) {
     on<HomeInitialized>(_handleInitialized);
     on<HomeRefreshRequested>(_handleRefreshRequested);
@@ -32,6 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final WorkRepository _workRepository;
   final LocationClient _locationClient;
   final AppUserRepository _appUserRepository;
+  final WorkApplicationRepository _workApplicationRepository;
 
   Future<void> _handleInitialized(
     HomeInitialized event,
@@ -156,97 +160,171 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     int? offset,
     int? limit,
   }) =>
-      _locationClient
-          .checkPermission()
-          .toTaskEither<GenericError>()
-          .flatMap(
-            (r) => switch (r) {
-              LocationPermission.denied => _locationClient.requestPermission(),
-              _ => TaskEither.right(r),
-            },
-          )
-          .flatMap<LocationPermission>(
-            (r) => switch (r) {
-              LocationPermission.always ||
-              LocationPermission.whileInUse =>
-                TaskEither.right(r),
-              _ => TaskEither.left(const GenericError.unknown()),
-            },
-          )
-          .flatMap((r) => _locationClient.getCurrentPosition())
-          .flatMap(
-            (r) => _workRepository
-                .getNearbyWorksWithDescription(
-                  r.latitude,
-                  r.longitude,
-                  descriptionLength: 160,
-                  ownerId: switch (state.filter) {
-                    WorkFilter.own =>
-                      _appUserRepository.currentUser.toNullable()!.id,
-                    _ => null,
-                  },
-                  limit: limit ?? _pageSize,
-                  offset: offset,
-                )
-                .map(
-                  (r) => r
-                      .map(
-                        (e) => HomeWork(
-                          id: e.id,
-                          createdAt: e.createdAt,
-                          title: e.title,
-                          address: e.address,
-                          lat: e.lat,
-                          lng: e.lng,
-                          ownerName: e.ownerName,
-                          status: e.status,
-                          distance: Option.of(e.distance),
-                          description: Option.fromNullable(e.description),
-                        ),
-                      )
-                      .toList(),
-                ),
-          )
-          .orElse(
-            (l) => _workRepository
-                .getWorks(
-                  from: 'home_page_works',
-                  columns: '''
-              id, created_at, title, lat, lng, address, status, description,
-              owner:profiles!owner_id(display_name)
-            ''',
-                  order: const ColumnOrder(column: 'created_at'),
-                  match: {
-                    'status': WorkStatus.open.name,
-                    if (state.filter.isOwn)
-                      'owner_id':
-                          _appUserRepository.currentUser.toNullable()!.id,
-                  },
-                  range: RowRange(
-                    from: offset ?? 0,
-                    to: (offset ?? 0) + _pageSize,
+      switch (state.filter) {
+        WorkFilter.applying => _workApplicationRepository
+            .getMany(
+              columns: '''
+                work:home_page_works!work_id(id, created_at, title, lat, lng, address, status, description,
+                recruiter:owner_id(display_name))
+              ''',
+              order: const ColumnOrder(column: 'created_at'),
+              match: {
+                'work.status': WorkStatus.open.name,
+                'applicant_id': _appUserRepository.currentUser.toNullable()!.id,
+              },
+              range: RowRange(
+                from: offset ?? 0,
+                to: (offset ?? 0) + _pageSize,
+              ),
+            )
+            .map(
+              (r) => r.map(
+                (e) {
+                  final work = e['work'] as Map<String, dynamic>;
+                  return HomeWork(
+                    id: work['id'] as String,
+                    ownerName: (work['recruiter']
+                        as Map<String, dynamic>)['display_name'] as String,
+                    createdAt: DateTime.parse(work['created_at'] as String),
+                    title: work['title'] as String,
+                    address: work['address'] as String,
+                    lat: work['lat'] as double,
+                    lng: work['lng'] as double,
+                    status: WorkStatus.values.byName(work['status'] as String),
+                    description:
+                        Option.fromNullable(work['description'] as String?),
+                  );
+                },
+              ).toList(),
+            ),
+        WorkFilter.own => _workRepository
+            .getWorks(
+              from: 'home_page_works',
+              columns: '''
+                id, created_at, title, lat, lng, address, status, description,
+                owner:profiles!owner_id(display_name)
+              ''',
+              order: const ColumnOrder(column: 'created_at'),
+              match: {
+                'owner_id': _appUserRepository.currentUser.toNullable()!.id,
+              },
+              range: RowRange(
+                from: offset ?? 0,
+                to: (offset ?? 0) + _pageSize,
+              ),
+            )
+            .map(
+              (r) => r
+                  .map(
+                    (e) => HomeWork(
+                      id: e['id'] as String,
+                      ownerName: (e['owner']
+                          as Map<String, dynamic>)['display_name'] as String,
+                      createdAt: DateTime.parse(e['created_at'] as String),
+                      title: e['title'] as String,
+                      address: e['address'] as String,
+                      lat: e['lat'] as double,
+                      lng: e['lng'] as double,
+                      status: WorkStatus.values.byName(e['status'] as String),
+                      description: Option.fromNullable(
+                        e['description'] as String?,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+        _ => _locationClient
+            .checkPermission()
+            .toTaskEither<GenericError>()
+            .flatMap(
+              (r) => switch (r) {
+                LocationPermission.denied =>
+                  _locationClient.requestPermission(),
+                _ => TaskEither.right(r),
+              },
+            )
+            .flatMap<LocationPermission>(
+              (r) => switch (r) {
+                LocationPermission.always ||
+                LocationPermission.whileInUse =>
+                  TaskEither.right(r),
+                _ => TaskEither.left(const GenericError.unknown()),
+              },
+            )
+            .flatMap((r) => _locationClient.getCurrentPosition())
+            .flatMap(
+              (r) => _workRepository
+                  .getNearbyWorksWithDescription(
+                    r.latitude,
+                    r.longitude,
+                    descriptionLength: 160,
+                    ownerId: switch (state.filter) {
+                      WorkFilter.own =>
+                        _appUserRepository.currentUser.toNullable()!.id,
+                      _ => null,
+                    },
+                    limit: limit ?? _pageSize,
+                    offset: offset,
+                  )
+                  .map(
+                    (r) => r
+                        .map(
+                          (e) => HomeWork(
+                            id: e.id,
+                            createdAt: e.createdAt,
+                            title: e.title,
+                            address: e.address,
+                            lat: e.lat,
+                            lng: e.lng,
+                            ownerName: e.ownerName,
+                            status: e.status,
+                            distance: Option.of(e.distance),
+                            description: Option.fromNullable(e.description),
+                          ),
+                        )
+                        .toList(),
                   ),
-                )
-                .map(
-                  (r) => r
-                      .map(
-                        (e) => HomeWork(
-                          id: e['id'] as String,
-                          ownerName: (e['owner']
-                                  as Map<String, dynamic>)['display_name']
-                              as String,
-                          createdAt: DateTime.parse(e['created_at'] as String),
-                          title: e['title'] as String,
-                          address: e['address'] as String,
-                          lat: e['lat'] as double,
-                          lng: e['lng'] as double,
-                          status:
-                              WorkStatus.values.byName(e['status'] as String),
-                          description:
-                              Option.fromNullable(e['description'] as String?),
-                        ),
-                      )
-                      .toList(),
-                ),
-          );
+            )
+            .orElse(
+              (l) => _workRepository
+                  .getWorks(
+                    from: 'home_page_works',
+                    columns: '''
+                      id, created_at, title, lat, lng, address, status, description,
+                      owner:profiles!owner_id(display_name)
+                    ''',
+                    order: const ColumnOrder(column: 'created_at'),
+                    match: {
+                      'status': WorkStatus.open.name,
+                    },
+                    range: RowRange(
+                      from: offset ?? 0,
+                      to: (offset ?? 0) + _pageSize,
+                    ),
+                  )
+                  .map(
+                    (r) => r
+                        .map(
+                          (e) => HomeWork(
+                            id: e['id'] as String,
+                            ownerName: (e['owner']
+                                    as Map<String, dynamic>)['display_name']
+                                as String,
+                            createdAt:
+                                DateTime.parse(e['created_at'] as String),
+                            title: e['title'] as String,
+                            address: e['address'] as String,
+                            lat: e['lat'] as double,
+                            lng: e['lng'] as double,
+                            status:
+                                WorkStatus.values.byName(e['status'] as String),
+                            description: Option.fromNullable(
+                              e['description'] as String?,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+            ),
+      };
 }

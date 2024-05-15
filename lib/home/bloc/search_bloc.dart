@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fpdart/fpdart.dart';
@@ -47,7 +49,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           match: {'status': WorkStatus.open.name},
           fullTextSearch: FullTextSearch(
             column: 'fts',
-            query: event.query.split(' ').join(' & '),
+            query: event.query.trim().split(' ').join(' | '),
           ),
           range: const RowRange(from: 0, to: 10),
         )

@@ -5,10 +5,12 @@ final class ThemedCircularProgressIndicator extends StatelessWidget {
     super.key,
     this.dimension,
     this.padding,
+    this.strokeWidth,
   });
 
   final double? dimension;
   final EdgeInsetsGeometry? padding;
+  final double? strokeWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +18,8 @@ final class ThemedCircularProgressIndicator extends StatelessWidget {
       dimension: dimension ?? 20,
       child: Padding(
         padding: padding ?? const EdgeInsets.all(1),
-        child: const CircularProgressIndicator.adaptive(
-          strokeWidth: 2,
+        child: CircularProgressIndicator.adaptive(
+          strokeWidth: strokeWidth ?? 2,
         ),
       ),
     );

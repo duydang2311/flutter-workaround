@@ -77,6 +77,42 @@ final class SupabaseWorkApplicationRepository
   }
 
   @override
+  TaskEither<GenericError, List<Map<String, dynamic>>> getMany({
+    String? from,
+    String columns = '*',
+    String? id,
+    String? workId,
+    String? applicantId,
+    RowRange? range,
+    ColumnOrder? order,
+    Map<String, dynamic>? match,
+  }) {
+    PostgrestTransformBuilder<PostgrestList> builder =
+        _client.from(from ?? 'work_applications').select(columns).match({
+      ...?match,
+      if (id != null) 'id': id,
+      if (workId != null) 'work_id': workId,
+      if (applicantId != null) 'applicant_id': applicantId,
+    });
+    if (range != null) {
+      builder = builder.range(
+        range.from,
+        range.to,
+        referencedTable: range.referencedTable,
+      );
+    }
+    if (order != null) {
+      builder = builder.order(
+        order.column,
+        ascending: order.ascending,
+        nullsFirst: order.nullsFirst,
+        referencedTable: order.referencedTable,
+      );
+    }
+    return TaskEither.tryCatch(() => builder, _catch);
+  }
+
+  @override
   TaskEither<GenericError, int> countByWorkId(
     String id, {
     String columns = '*',

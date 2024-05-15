@@ -143,14 +143,14 @@ class WorkBloc extends Bloc<WorkEvent, WorkState> {
         .match((l) {
       emit(
         state.copyWith(
-          status: state.status.clone()..add(UiStatus.fabLoading),
+          status: state.status.clone()..remove(UiStatus.fabLoading),
           error: Option.of(UiError.now(message: l.formatted)),
         ),
       );
     }, (r) {
       emit(
         state.copyWith(
-          status: state.status.clone()..add(UiStatus.fabLoading),
+          status: state.status.clone()..remove(UiStatus.fabLoading),
           applicationId: const Option.none(),
         ),
       );

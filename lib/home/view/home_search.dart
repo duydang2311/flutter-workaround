@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:workaround/home/bloc/search_bloc.dart';
 import 'package:workaround/home/home.dart';
-import 'package:workaround/theme/theme.dart';
 
 final class HomeSearch extends SearchDelegate<Option<SearchWork>> {
   HomeSearch({required this.bloc});
