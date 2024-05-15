@@ -6,6 +6,7 @@ import 'package:location_client/location_client.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:very_good_infinite_list/very_good_infinite_list.dart';
+import 'package:work_application_repository/work_application_repository.dart';
 import 'package:work_repository/work_repository.dart' hide Work;
 import 'package:workaround/home/bloc/search_bloc.dart';
 import 'package:workaround/home/home.dart';
@@ -27,6 +28,8 @@ final class HomePage extends StatelessWidget {
         workRepository: RepositoryProvider.of<WorkRepository>(context),
         locationClient: RepositoryProvider.of<LocationClient>(context),
         appUserRepository: RepositoryProvider.of<AppUserRepository>(context),
+        workApplicationRepository:
+            RepositoryProvider.of<WorkApplicationRepository>(context),
       )..add(const HomeInitialized()),
       child: const _HomeView(),
     );
@@ -79,14 +82,16 @@ final class _HomeView extends StatelessWidget {
         builder: (context, state) => NavigationDrawer(
           selectedIndex: switch (state.filter) {
             WorkFilter.all => 0,
-            WorkFilter.own => 1,
+            WorkFilter.applying => 1,
+            WorkFilter.own => 2,
           },
           onDestinationSelected: (index) {
             homeBloc.add(
               HomeWorkFilterChanged(
                 switch (index) {
                   0 => WorkFilter.all,
-                  1 => WorkFilter.own,
+                  1 => WorkFilter.applying,
+                  2 => WorkFilter.own,
                   _ => WorkFilter.all,
                 },
               ),
@@ -106,6 +111,14 @@ final class _HomeView extends StatelessWidget {
                 _ => const Icon(Icons.view_list_outlined),
               },
               label: const Text('Open works'),
+            ),
+            NavigationDrawerDestination(
+              icon: switch (state.filter) {
+                WorkFilter.applying =>
+                  const Icon(Icons.pending_actions_rounded),
+                _ => const Icon(Icons.pending_actions_outlined),
+              },
+              label: const Text('Applying works'),
             ),
             NavigationDrawerDestination(
               icon: switch (state.filter) {
@@ -171,10 +184,13 @@ final class _WorkList extends StatelessWidget {
           onFetchData: () {
             context.read<HomeBloc>().add(const HomeMoreWorksRequested());
           },
+          centerLoading: true,
           isLoading: state.status.isLoading,
           itemCount: state.works.length,
           hasReachedMax: state.hasReachedMax,
           separatorBuilder: (_, __) => const Divider(height: 0),
+          emptyBuilder: (context) => const Text("It's empty here."),
+          centerEmpty: true,
           itemBuilder: (context, index) {
             final work = state.works[index];
             return ListTile(

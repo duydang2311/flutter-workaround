@@ -227,7 +227,7 @@ final class SupabaseWorkRepository implements WorkRepository {
           if (kmRadius != null) 'radius': kmRadius * 1000,
           'max_rows': limit ?? 10,
           'description_length': descriptionLength,
-          if (ownerId != null) 'owner_id': ownerId,
+          if (ownerId != null) '_owner_id': ownerId,
           'skipped_rows': offset ?? 0,
         },
       ),
