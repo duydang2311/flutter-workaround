@@ -28,7 +28,7 @@ final class WorkPage extends StatelessWidget {
         appBar: AppBar(
           leading: BlocBuilder<WorkBloc, WorkState>(
             builder: (context, state) => IconButton(
-              icon: const Icon(Icons.chevron_left_rounded),
+              icon: const BackButtonIcon(),
               onPressed: () {
                 Navigator.of(context).pop(state.work.toNullable());
               },

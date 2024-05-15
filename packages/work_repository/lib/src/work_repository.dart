@@ -37,5 +37,6 @@ abstract interface class WorkRepository {
     ColumnOrder? order,
     RowRange? range,
     Map<String, dynamic>? match,
+    FullTextSearch? fullTextSearch,
   });
 }
