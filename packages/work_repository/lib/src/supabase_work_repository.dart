@@ -129,7 +129,9 @@ final class SupabaseWorkRepository implements WorkRepository {
 
   void _handleStreamCancel() {
     TaskEither.tryCatch(
-        _insertRealtimeChannel!.unsubscribe, (error, _) => error).match((l) {
+      _insertRealtimeChannel!.unsubscribe,
+      (error, _) => error,
+    ).match((l) {
       _insertRealtimeChannel = null;
       log('[SupabaseWorkRepository] _handleStreamCancel: $l');
     }, (r) {
@@ -173,12 +175,17 @@ final class SupabaseWorkRepository implements WorkRepository {
     RowRange? range,
     ColumnOrder? order,
     Map<String, dynamic>? match,
+    FullTextSearch? fullTextSearch,
   }) {
     PostgrestTransformBuilder<List<Map<String, dynamic>>> builder = _supabase
         .client
         .from(from ?? 'works')
         .select(columns)
         .match(match ?? {});
+    if (fullTextSearch != null) {
+      builder = (builder as PostgrestFilterBuilder<List<Map<String, dynamic>>>)
+          .textSearch(fullTextSearch.column, fullTextSearch.query);
+    }
     if (order != null) {
       builder = builder.order(
         order.column,
@@ -186,9 +193,6 @@ final class SupabaseWorkRepository implements WorkRepository {
         nullsFirst: order.nullsFirst,
         referencedTable: order.referencedTable,
       );
-    }
-    if (range != null) {
-      builder = builder.range(range.from, range.to);
     }
     if (range != null) {
       builder = builder.range(

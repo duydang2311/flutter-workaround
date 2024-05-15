@@ -35,5 +35,11 @@ final class HomeState extends Equatable {
       );
 
   @override
-  List<Object> get props => [works, error, filter, status, timestamp];
+  List<Object> get props => [
+        works,
+        error,
+        filter,
+        status,
+        timestamp,
+      ];
 }

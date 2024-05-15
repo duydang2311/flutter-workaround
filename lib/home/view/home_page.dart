@@ -7,7 +7,9 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 import 'package:work_repository/work_repository.dart' hide Work;
+import 'package:workaround/home/bloc/search_bloc.dart';
 import 'package:workaround/home/home.dart';
+import 'package:workaround/home/view/home_search.dart';
 import 'package:workaround/home_scaffold/home_scaffold.dart';
 import 'package:workaround/theme/theme.dart';
 import 'package:workaround/work/work.dart';
@@ -38,78 +40,108 @@ final class _HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<HomeScaffoldBloc>();
     final homeBloc = context.read<HomeBloc>();
+    final scaffoldData = ScaffoldData(
+      appBar: ThemedAppBar(
+        title: const ThemedAppBarTitle('Home'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              (await showSearch(
+                context: context,
+                delegate: HomeSearch(
+                  bloc: SearchBloc(
+                    workRepository: RepositoryProvider.of<WorkRepository>(
+                      context,
+                    ),
+                  ),
+                ),
+                useRootNavigator: true,
+              ))
+                  ?.match(() {}, (t) {
+                GoRouter.of(context).pushNamed(
+                  'works',
+                  pathParameters: {'id': t.id},
+                );
+              });
+            },
+            icon: const Icon(Icons.search),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.pushNamed('create-work');
+        },
+        child: const Icon(Icons.add),
+      ),
+      drawer: BlocBuilder<HomeBloc, HomeState>(
+        bloc: homeBloc,
+        builder: (context, state) => NavigationDrawer(
+          selectedIndex: switch (state.filter) {
+            WorkFilter.all => 0,
+            WorkFilter.own => 1,
+          },
+          onDestinationSelected: (index) {
+            homeBloc.add(
+              HomeWorkFilterChanged(
+                switch (index) {
+                  0 => WorkFilter.all,
+                  1 => WorkFilter.own,
+                  _ => WorkFilter.all,
+                },
+              ),
+            );
+          },
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
+              child: Text(
+                'Works',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+            NavigationDrawerDestination(
+              icon: switch (state.filter) {
+                WorkFilter.all => const Icon(Icons.view_list_rounded),
+                _ => const Icon(Icons.view_list_outlined),
+              },
+              label: const Text('Open works'),
+            ),
+            NavigationDrawerDestination(
+              icon: switch (state.filter) {
+                WorkFilter.own => const Icon(Icons.person_rounded),
+                _ => const Icon(Icons.person_outline),
+              },
+              label: const Text('My works'),
+            ),
+          ],
+        ),
+      ),
+    );
+
     bloc.add(
       HomeScaffoldChanged(
         scaffoldMap: {
           ...bloc.state.scaffoldMap,
-          'home': ScaffoldData(
-            appBar: ThemedAppBar(
-              title: const ThemedAppBarTitle('Home'),
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                context.pushNamed('create-work');
-              },
-              child: const Icon(Icons.add),
-            ),
-            drawer: BlocBuilder<HomeBloc, HomeState>(
-              bloc: homeBloc,
-              builder: (context, state) => NavigationDrawer(
-                selectedIndex: switch (state.filter) {
-                  WorkFilter.all => 0,
-                  WorkFilter.own => 1,
-                },
-                onDestinationSelected: (index) {
-                  homeBloc.add(
-                    HomeWorkFilterChanged(
-                      switch (index) {
-                        0 => WorkFilter.all,
-                        1 => WorkFilter.own,
-                        _ => WorkFilter.all,
-                      },
-                    ),
-                  );
-                },
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
-                    child: Text(
-                      'Works',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                  NavigationDrawerDestination(
-                    icon: switch (state.filter) {
-                      WorkFilter.all => const Icon(Icons.view_list_rounded),
-                      _ => const Icon(Icons.view_list_outlined),
-                    },
-                    label: const Text('All works'),
-                  ),
-                  NavigationDrawerDestination(
-                    icon: switch (state.filter) {
-                      WorkFilter.own => const Icon(Icons.person_rounded),
-                      _ => const Icon(Icons.person_outline),
-                    },
-                    label: const Text('My works'),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          'home': scaffoldData,
         },
       ),
     );
 
-    return BlocListener<HomeBloc, HomeState>(
-      listenWhen: (previous, current) =>
-          current.error.isSome() && previous.error != current.error,
-      listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.error.toNullable()!.message),
-          ),
-        );
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<HomeBloc, HomeState>(
+          listenWhen: (previous, current) =>
+              current.error.isSome() && previous.error != current.error,
+          listener: (context, state) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.error.toNullable()!.message),
+              ),
+            );
+          },
+        ),
+      ],
       child: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
