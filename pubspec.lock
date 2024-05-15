@@ -764,13 +764,13 @@ packages:
     source: path
     version: "0.1.0+1"
   logger:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: logger
-      sha256: af05cc8714f356fd1f3888fb6741cbe9fbe25cdb6eedbab80e1a6db21047d4a4
+      sha256: "8c94b8c219e7e50194efc8771cd0e9f10807d8d3e219af473d89b06cc2ee4e04"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.0"
+    version: "2.2.0"
   logging:
     dependency: transitive
     description:
