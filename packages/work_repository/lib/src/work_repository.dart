@@ -36,7 +36,7 @@ abstract interface class WorkRepository {
     String columns = '*',
     ColumnOrder? order,
     RowRange? range,
-    Map<String, dynamic>? match,
+    Map<String, Object>? match,
     FullTextSearch? fullTextSearch,
   });
 }

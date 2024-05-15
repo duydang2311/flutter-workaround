@@ -85,7 +85,7 @@ final class SupabaseWorkApplicationRepository
     String? applicantId,
     RowRange? range,
     ColumnOrder? order,
-    Map<String, dynamic>? match,
+    Map<String, Object>? match,
   }) {
     PostgrestTransformBuilder<PostgrestList> builder =
         _client.from(from ?? 'work_applications').select(columns).match({
