@@ -174,7 +174,7 @@ final class SupabaseWorkRepository implements WorkRepository {
     String columns = '*',
     RowRange? range,
     ColumnOrder? order,
-    Map<String, dynamic>? match,
+    Map<String, Object>? match,
     FullTextSearch? fullTextSearch,
   }) {
     PostgrestTransformBuilder<List<Map<String, dynamic>>> builder = _supabase

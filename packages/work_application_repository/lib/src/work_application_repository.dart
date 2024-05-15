@@ -29,7 +29,7 @@ abstract interface class WorkApplicationRepository {
     String? applicantId,
     RowRange? range,
     ColumnOrder? order,
-    Map<String, dynamic>? match,
+    Map<String, Object>? match,
   });
   TaskEither<GenericError, int> countByWorkId(
     String id, {
